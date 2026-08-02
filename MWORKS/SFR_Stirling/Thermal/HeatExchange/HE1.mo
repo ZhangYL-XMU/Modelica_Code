@@ -1,7 +1,25 @@
 within SFR.Thermal.HeatExchange;
 model HE1
   annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=100,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=100,StoreEventValue=0,Tolerance=0.0001));
+grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=100,StoreEventValue=0,Tolerance=0.0001),Icon(coordinateSystem(extent={{-100,-100},{100,100}},
+grid={2,2}),graphics = {Rectangle(origin={0,0},
+fillColor={255,255,255},
+fillPattern=FillPattern.Solid,
+extent={{-100,100},{100,-100}}), Polygon(origin={73,-62.0181},
+fillColor={170,0,0},
+fillPattern=FillPattern.Solid,
+points={{-7,16},{7,0.0181},{-7,-16}}), Rectangle(origin={-7,-62.0181},
+fillColor={170,0,0},
+fillPattern=FillPattern.Solid,
+extent={{-73,6},{73,-6}}), Polygon(origin={-73,59.9819},
+fillColor={170,0,255},
+fillPattern=FillPattern.Solid,
+points={{7,16},{-7,0},{7,-16}}), Rectangle(origin={7,59.9819},
+fillColor={170,0,255},
+fillPattern=FillPattern.Solid,
+extent={{73,6},{-73,-6}}), Line(origin={-40,0},
+points={{20,40},{-20,30},{20,20},{-20,10},{20,0},{-20,-10},{20,-20},{-20,-30},{20,-40}}), Line(origin={40,0},
+points={{20,40},{-20,30},{20,20},{-20,10},{20,0},{-20,-10},{20,-20},{-20,-30},{20,-40}})}));
   TYThermoFluidSys.Thermal.TubeWall tubeWall(N=4,r_inner(displayUnit="mm")=0.0136,r_outer(displayUnit="mm")=0.016,length=2,T_reference=fill(273.15+440,4),exposeState_a=true,exposeState_b=true,T_start=fill(298.15+440, 4)) 
     annotation (Placement(transformation(origin={7.10543e-15,-8},
 extent={{-10,-10},{10,10}},

@@ -543,18 +543,80 @@ color={0,127,255}));
   model SecondLoop
     annotation(__MWORKS(version="26.1.3"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})));
-    SFR.Stirling.StirlingEngine.StirlingEngine_simplified stirlingEngine 
-      annotation (Placement(transformation(origin={5.74791,40},
-extent={{-56.9921,41},{56.9921,-41}},
-rotation=-90)));
+    Thermal.HeatExchange.HE1 hE1_1 
+      annotation (Placement(transformation(origin={-233.747,32.0938625},
+extent={{10,10},{-10,-10}},
+rotation=90)));
     TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={-99.252095,8.0844},
+      annotation (Placement(transformation(origin={-160.253,0.178262},
 extent={{10,-10},{-10,10}})));
-  equation
-    connect(stirlingEngine.cold, pump2.port_a) 
-    annotation(Line(origin={-89.252095,7.991},
-    points={{54,0.093424},{0,0.0934}},
+    Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
+          displayUnit="1") = {1,0,0}) annotation (Placement(transformation(origin={-118.253,232.085},
+extent={{-10,-10},{10,10}},
+rotation=180)));
+    inner Modelica.Mechanics.MultiBody.World world 
+      annotation (Placement(transformation(origin={-182.253,232.085},
+extent={{-10,-10},{10,10}})));
+    Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2) 
+      annotation (Placement(transformation(origin={-98.253,180.085},
+extent={{-10,-10},{10,10}})));
+    Stirling.StirlingEngine.Engine_V2 stirling(heff=0.25) 
+      annotation (Placement(transformation(origin={-37.253,29.0000025},
+extent={{-51.084865,41},{51.084865,-41}},
+rotation=-90)));
+    Modelica.Fluid.Sources.Boundary_pT boundary1(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, p=1e5) 
+      annotation (Placement(transformation(origin={-202.253,104.085},
+extent={{10,-10},{-10,10}})));
+    Modelica.Fluid.Sources.MassFlowSource_T boundary4(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, m_flow=280.6, T(displayUnit="degC")=823.15) 
+      annotation (Placement(transformation(origin={-300,74},
+extent={{-10,-10},{10,10}})));
+    Modelica.Fluid.Sources.Boundary_pT boundary(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, T=713.15, p=1e5) 
+      annotation (Placement(transformation(origin={-294,-12.0849},
+extent={{-10,-10},{10,10}})));
+    equation
+    connect(pump2.port_b, hE1_1.tube_in) 
+    annotation(Line(origin={-212.253,11.0848625},
+    points={{42,-10.9066},{-15.4958,-10.9066},{-15.4958,10.809}},
     color={0,127,255}));
+    connect(world.frame_b, revolute.frame_b) 
+    annotation(Line(origin={17.747,252.085},
+    points={{-190,-20},{-146,-20}},
+    color={95,95,95},
+    thickness=0.5));
+    connect(inertia.flange_b, revolute.axis) 
+    annotation(Line(origin={17.747,252.085},
+    points={{-106,-72},{-103,-72},{-103,-33},{-136,-33},{-136,-30}},
+    color={0,0,0}));
+    connect(world.frame_b, stirling.cylinder_a) 
+    annotation(Line(origin={17.747,252.085},
+    points={{-190,-20},{-177,-20},{-177,-92},{-74.68,-92},{-74.68,-171.27}},
+    color={95,95,95},
+    thickness=0.5));
+    connect(revolute.frame_a, stirling.cylinder_a1) 
+    annotation(Line(origin={43.747,254.085},
+    points={{-152,-22},{-55.58,-22},{-55.58,-173.27}},
+    color={95,95,95},
+    thickness=0.5));
+    connect(hE1_1.tube_out, stirling.hot) 
+    annotation(Line(origin={-153.253,83.0848625},
+    points={{-74.49581,-40.791},{-74.49581,-23.4339},{75.82,-23.4339}},
+    color={0,127,255}));
+    connect(stirling.cold, pump2.port_a) 
+    annotation(Line(origin={-115.253,31.0848625},
+    points={{37.82,-31.2984},{-35,-31.2984},{-35,-30.9066}},
+    color={0,127,255}));
+    connect(boundary1.ports[1], hE1_1.tube_out) 
+    annotation(Line(origin={-220.253,73.0848625},
+    points={{8,31},{-7.49581,31},{-7.49581,-30.791}},
+    color={0,127,255}));
+    connect(boundary4.ports[1], hE1_1.shell_in) 
+    annotation(Line(origin={-394,-0.0848625},
+points={{104,74.0848625},{154.05119,74.0848625},{154.05119,42.378725}},
+color={0,127,255}));
+    connect(hE1_1.shell_out, boundary.ports[1]) 
+    annotation(Line(origin={-335,3.9151375},
+points={{95.0512,17.9787},{95.0512,-16},{51,-16}},
+color={0,127,255}));
     end SecondLoop;
 
 end Closed;
