@@ -114,8 +114,8 @@ package Closed
   color={0,127,255}));
     end FirstLoop_without_Reactor;
   model FirstLoop
-    annotation(__MWORKS(version="26.1.3"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2})));
+    annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=3600,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
+grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=3600,StoreEventValue=0,Tolerance=0.0001));
     TYThermoFluidSys.Sensors.SensorT TSensor1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
       annotation (Placement(transformation(origin={-37,40.8213},
 extent={{-10,-10},{10,10}})));
@@ -156,7 +156,7 @@ extent={{-10,-10},{10,10}})));
     TYThermoFluidSys.Blocks.Constant const3(k=0) 
       annotation (Placement(transformation(origin={-205,63.98375},
 extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
+    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=0, duration=100, startTime=400) 
       annotation (Placement(transformation(origin={-355,13.88505},
 extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Sources.RealExpression realExpression1(y=TSensor2.T) 
@@ -541,8 +541,8 @@ points={{8,31},{-7.49581,31},{-7.49581,-30.791}},
 color={0,127,255}));
     end SFR_Stirling;
   model SecondLoop
-    annotation(__MWORKS(version="26.1.3"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2})));
+    annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=3600,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
+grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=3600,StoreEventValue=0,Tolerance=0.0001));
     Thermal.HeatExchange.HE1 hE1_1 
       annotation (Placement(transformation(origin={-233.747,32.0938625},
 extent={{10,10},{-10,-10}},
@@ -560,7 +560,7 @@ extent={{-10,-10},{10,10}})));
     Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2) 
       annotation (Placement(transformation(origin={-98.253,180.085},
 extent={{-10,-10},{10,10}})));
-    Stirling.StirlingEngine.Engine_V2 stirling(heff=0.25) 
+    Stirling.StirlingEngine.Engine_V2_Static stirling(heff=0.25) 
       annotation (Placement(transformation(origin={-37.253,29.0000025},
 extent={{-51.084865,41},{51.084865,-41}},
 rotation=-90)));

@@ -2,3 +2,6 @@ Gas_Dynamic
 Gas_Dynamic_new
 Gas_Dynamic_test
 Gas_Partial
+Gas_Static
+Gas_Static_test
+Gas_Dynamic_Static
