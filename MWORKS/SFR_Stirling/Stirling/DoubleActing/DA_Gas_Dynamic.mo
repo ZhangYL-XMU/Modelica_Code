@@ -34,7 +34,7 @@ model DA_Gas_Dynamic
   parameter Real cp = cv + R_gas "氦气定压比热容 [J/(kg·K)]";
 
   // ---- 参考压力(工质最高 20 MPa) ----
-  parameter SI.Pressure P_m = 2.0e7 "循环参考压力 [Pa]";
+  parameter SI.Pressure P_m = 1.35e7 "循环参考压力 [Pa]";
 
   // ---- 活塞位移参考(与机械 Prismatic 安装位置对应) ----
   parameter SI.Length s_ref = -0.12 "活塞行程中点参考 [m]";
@@ -64,14 +64,24 @@ model DA_Gas_Dynamic
   parameter SI.Mass mreg0 = P_m*V_reg/(R_gas*T_reg_nom) "回热器初始工质质量 [kg]";
 
   // ---- 接口 ----
-  Modelica.Blocks.Interfaces.RealInput s[4] "4 缸活塞位移 [m]" annotation(Placement(transformation(extent={{-140,-60},{-100,-20}})));
-  Modelica.Blocks.Interfaces.RealInput v[4] "4 缸活塞速度 [m/s]" annotation(Placement(transformation(extent={{-140,-100},{-100,-60}})));
-  Modelica.Blocks.Interfaces.RealInput T_na "钠热源温度 [K]" annotation(Placement(transformation(extent={{-140,0},{-100,40}})));
-  Modelica.Blocks.Interfaces.RealInput T_water "冷却水温度 [K]" annotation(Placement(transformation(extent={{-140,-20},{-100,20}})));
+  Modelica.Blocks.Interfaces.RealInput s[4] "4 缸活塞位移 [m]" annotation(Placement(transformation(origin={-120,60},
+extent={{-20,-20},{20,20}})));
+  Modelica.Blocks.Interfaces.RealInput v[4] "4 缸活塞速度 [m/s]" annotation(Placement(transformation(origin={-120,-60},
+extent={{-20,-20},{20,20}})));
+  Modelica.Blocks.Interfaces.RealInput T_na "钠热源温度 [K]" annotation(Placement(transformation(origin={-40,120},
+extent={{-20,-20},{20,20}},
+rotation=-90)));
+  Modelica.Blocks.Interfaces.RealInput T_water "冷却水温度 [K]" annotation(Placement(transformation(origin={40,120},
+extent={{-20,-20},{20,20}},
+rotation=270)));
   Modelica.Blocks.Interfaces.RealOutput f[4] "4 缸活塞力 [N]" annotation(Placement(transformation(extent={{100,-40},{140,0}})));
   Modelica.Blocks.Interfaces.RealOutput power "总指示功率 [W]" annotation(Placement(transformation(extent={{100,40},{140,80}})));
-  Modelica.Blocks.Interfaces.RealOutput Q_in "总吸热量 [W]" annotation(Placement(transformation(extent={{100,0},{140,40}})));
-  Modelica.Blocks.Interfaces.RealOutput Q_out "总放热量 [W]" annotation(Placement(transformation(extent={{100,-80},{140,-40}})));
+  Modelica.Blocks.Interfaces.RealOutput Q_in "总吸热量 [W]" annotation(Placement(transformation(origin={-40,-122},
+extent={{-20,-20},{20,20}},
+rotation=270)));
+  Modelica.Blocks.Interfaces.RealOutput Q_out "总放热量 [W]" annotation(Placement(transformation(origin={40,-122},
+extent={{-20,-20},{20,20}},
+rotation=270)));
 
   // ---- 控制体积几何与体积变化率 ----
   Real Vh[4] "热侧体积(热腔+加热器) [m3]";

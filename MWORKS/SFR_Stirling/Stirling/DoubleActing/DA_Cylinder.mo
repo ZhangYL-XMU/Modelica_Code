@@ -25,19 +25,19 @@ model DA_Cylinder
   // ---- 接口 ----
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cylinder_a "机架连接(左)" annotation(Placement(transformation(origin={-300,112},
 extent={{-16,-16},{16,16}}),
-iconTransformation(origin={-100,100},
+iconTransformation(origin={-86,84},
 extent={{-16,-16},{16,16}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cylinder_b "机架连接(右)" annotation(Placement(transformation(origin={110,111},
 extent={{-16,-16},{16,16}}),
-iconTransformation(origin={100,100},
+iconTransformation(origin={88,84},
 extent={{-16,-16},{16,16}})));
-  Modelica.Mechanics.MultiBody.Interfaces.Frame_a crank_a "曲轴连接(左)" annotation(Placement(transformation(origin={112,-384},
-extent={{-16,-16},{16,16}}),
-iconTransformation(origin={100,-100},
-extent={{-16,-16},{16,16}})));
-  Modelica.Mechanics.MultiBody.Interfaces.Frame_a crank_b "曲轴连接(右)" annotation(Placement(transformation(origin={-330,-388},
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a crank_a "曲轴连接(左)" annotation(Placement(transformation(origin={-301,-388},
 extent={{16,-16},{-16,16}}),
-iconTransformation(origin={-100,-100},
+iconTransformation(origin={-86,-84},
+extent={{-16,-16},{16,16}})));
+  Modelica.Mechanics.MultiBody.Interfaces.Frame_a crank_b "曲轴连接(右)" annotation(Placement(transformation(origin={110,-388},
+extent={{-16,-16},{16,16}}),
+iconTransformation(origin={88,-84},
 extent={{-16,-16},{16,16}})));
   Modelica.Blocks.Interfaces.RealInput f_mt "活塞驱动力 [N]" annotation(Placement(transformation(origin={-80,-440},
 extent={{-10,-10},{10,10}},
@@ -111,7 +111,7 @@ rotation=-90)));
     animation = animation,
     cylinderDiameter = 0.055) annotation(Placement(transformation(origin={-190,-280},
 extent={{-20,-20},{20,20}})));
-  Modelica.Mechanics.MultiBody.Parts.FixedTranslation mid(r = {crankPinLength/2,0,0}, animation = false) annotation(Placement(transformation(origin={-120,-353},
+  Modelica.Mechanics.MultiBody.Parts.FixedTranslation mid(r = {crankPinLength/2,0,0}, animation = false) annotation(Placement(transformation(origin={-122,-338},
 extent={{-15,-15},{15,15}},
 rotation=180)));
   Modelica.Mechanics.MultiBody.Parts.BodyBox crank2(
@@ -119,41 +119,41 @@ rotation=180)));
     widthDirection = {1,0,0},
     width = 0.02,
     r = {0, crankPinOffset, 0},
-    animation = animation) annotation(Placement(transformation(origin={-70,-388},
-extent={{15,-15},{-15,15}})));
+    animation = animation) annotation(Placement(transformation(origin={-150,-388},
+extent={{-15,-15},{15,15}})));
   Modelica.Mechanics.MultiBody.Parts.BodyCylinder crank1(
     diameter = 0.05,
     r_shape = {-0.01,0,0},
     length = 0.12,
     r = {crankLength - crankPinLength,0,0},
     color = {180,180,180},
-    animation = animation) annotation(Placement(transformation(origin={-5.5,-388},
-extent={{25,-10},{-25,10}})));
+    animation = animation) annotation(Placement(transformation(origin={-202,-388},
+extent={{-25,-10},{25,10}})));
   Modelica.Mechanics.MultiBody.Parts.FixedRotation crankAngle1(
     n_y = {0, Modelica.Math.cos(crankAngleOffset), Modelica.Math.sin(crankAngleOffset)},
     animation = false,
-    rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.TwoAxesVectors) annotation(Placement(transformation(origin={64,-388},
-extent={{20,-20},{-20,20}})));
+    rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.TwoAxesVectors) annotation(Placement(transformation(origin={-259,-388},
+extent={{-20,-20},{20,20}})));
   Modelica.Mechanics.MultiBody.Parts.BodyCylinder crank3(
     r_shape = {-0.01,0,0},
     length = 0.12,
     diameter = 0.03,
     r = {crankPinLength,0,0},
     color = {180,180,180},
-    animation = animation) annotation(Placement(transformation(origin={-157,-388},
-extent={{25,-10},{-25,10}})));
+    animation = animation) annotation(Placement(transformation(origin={-65,-388},
+extent={{-25,-10},{25,10}})));
   Modelica.Mechanics.MultiBody.Parts.BodyBox crank4(
     height = 0.05,
     widthDirection = {1,0,0},
     width = 0.02,
     r = {0, -crankPinOffset, 0},
-    animation = animation) annotation(Placement(transformation(origin={-227,-388},
-extent={{15,-15},{-15,15}})));
+    animation = animation) annotation(Placement(transformation(origin={-7,-388},
+extent={{-15,-15},{15,15}})));
   Modelica.Mechanics.MultiBody.Parts.FixedRotation crankAngle2(
     n_y = {0, Modelica.Math.cos(-crankAngleOffset), Modelica.Math.sin(-crankAngleOffset)},
     animation = false,
-    rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.TwoAxesVectors) annotation(Placement(transformation(origin={-278,-388},
-extent={{20,-20},{-20,20}})));
+    rotationType = Modelica.Mechanics.MultiBody.Types.RotationTypes.TwoAxesVectors) annotation(Placement(transformation(origin={46,-388},
+extent={{-20,-20},{20,20}})));
 
   // ---- 传感器 ----
   Modelica.Mechanics.Translational.Sensors.PositionSensor positionSensor annotation(Placement(transformation(origin={142,-88},
@@ -162,7 +162,7 @@ extent={{-20,-20},{20,20}})));
 equation
   // ---- 曲柄销平面回路 ----
   connect(b1.frame_a, mid.frame_b) annotation(Line(origin={0,0},
-points={{-210,-280},{-266,-280},{-266,-353},{-135,-353}},
+points={{-210,-280},{-266,-280},{-266,-338},{-137,-338}},
 color={95,95,95}));
   connect(connectingRod.frame_a, b1.frame_b) annotation(Line(origin={0,0},
 points={{-66,-266},{-66,-280},{-170,-280}},
@@ -172,8 +172,8 @@ color={95,95,95}));
 points={{-66,-67},{-66,-95}},
 color={95,95,95}));
   // ---- 曲柄链(上排): 主轴段 → 相位 → 曲轴接口 ----
-  connect(crank1.frame_a, crankAngle1.frame_b) annotation(Line(origin={0,0},
-points={{19.5,-388},{44,-388}},
+  connect(crank1.frame_a, crankAngle1.frame_b) annotation(Line(origin={55,-28},
+points={{-282,-360},{-294,-360}},
 color={95,95,95}));
   // ---- 活塞销 ----
   connect(b2.frame_a, piston.frame_a) annotation(Line(origin={0,-48},
@@ -184,7 +184,7 @@ points={{-66,-178},{-66,-158}},
 color={95,95,95}));
   // ---- 曲柄链(下排): 下臂 → 相位 ----
   connect(crank4.frame_b, crankAngle2.frame_a) annotation(Line(origin={-98,2},
-points={{-144,-390},{-160,-390}},
+points={{106,-390},{124,-390}},
 color={95,95,95}));
   // ---- 机架链: 倾角 → 气缸顶 ----
   connect(cylinderInclination.frame_b, cylinderTop.frame_a) annotation(Line(origin={0,0},
@@ -192,18 +192,18 @@ points={{-145,78},{-139.8,78},{-139.8,56},{-145.4,56},{-145.4,26},{-141,26}},
 color={95,95,95}));
   // ---- 曲柄链(上排): 主轴段 → 上臂 ----
   connect(crank1.frame_b, crank2.frame_a) annotation(Line(origin={0,0},
-points={{-30.5,-388},{-55,-388}},
+points={{-177,-388},{-165,-388}},
 color={95,95,95}));
   // ---- 曲柄链(下排): 曲柄销轴 → 下臂 ----
   connect(crank3.frame_b, crank4.frame_a) annotation(Line(origin={-98,2},
-points={{-84,-390},{-114,-390}},
+points={{58,-390},{76,-390}},
 color={95,95,95}));
   // ---- 上下曲柄链耦合: 曲柄销轴 → 上臂 ----
   connect(crank3.frame_a, crank2.frame_b) annotation(Line(origin={0,0},
-points={{-132,-388},{-85,-388}},
+points={{-90,-388},{-135,-388}},
 color={95,95,95}));
   connect(crank2.frame_b, mid.frame_a) annotation(Line(origin={0,0},
-points={{-85,-388},{-100.6,-388},{-100.6,-353},{-105,-353}},
+points={{-135,-388},{-102.6,-388},{-102.6,-338},{-107,-338}},
 color={95,95,95}));
   // ---- 气缸顶 → 移动副 ----
   connect(cylinderTop.frame_b, cylinder.frame_a) annotation(Line(origin={0,0},
@@ -220,11 +220,11 @@ color={95,95,95}));
 points={{-51,112},{110,112},{110,111}},
 color={95,95,95}));
   // ---- 曲轴接口 ----
-  connect(crankAngle1.frame_a, crank_a) annotation(Line(origin={0,0},
-points={{84,-388},{112,-388},{112,-384}},
+  connect(crankAngle1.frame_a, crank_a) annotation(Line(origin={55,-28},
+points={{-334,-360},{-356,-360}},
 color={95,95,95}));
   connect(crankAngle2.frame_b, crank_b) annotation(Line(origin={-366,7},
-points={{68,-395},{36,-395}},
+points={{432,-395},{476,-395}},
 color={95,95,95}));
   // ---- 气体力施加到移动副(support ↔ axis) ----
   connect(gasForce.flange_b, cylinder.support) annotation(Line(origin={0,0},
@@ -242,7 +242,10 @@ color={0,127,0}));
 
   annotation(
     Icon(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2}),graphics = {Rectangle(origin={0,27},
+grid={2,2}),graphics = {Rectangle(origin={0,0},
+fillColor={255,255,255},
+fillPattern=FillPattern.Solid,
+extent={{-100,100},{100,-100}}), Rectangle(origin={0,27},
 fillColor={255,255,255},
 fillPattern=FillPattern.VerticalCylinder,
 extent={{-60,53},{60,-53}}), Rectangle(origin={8.88178e-16,17},
@@ -261,15 +264,9 @@ fillColor={175,175,175},
 fillPattern=FillPattern.Solid,
 extent={{-22,-22},{22,22}}), Line(origin={0,0},
 points={{0,-70},{0,-100}},
-color={0,0,0}), Line(origin={-1,-100},
-points={{-97,0},{97,0}},
+color={0,0,0}), Line(origin={-1,-84},
+points={{-87,0},{87,0}},
 color={0,0,0},
-thickness=2), Line(origin={14.8,-5.26316},
-points={{-108.8,105.263},{-40.8,65.2632}},
-color={95,95,95},
-thickness=1), Line(origin={-14.8,-5.26311},
-points={{108.8,105.263},{40.8,65.2631}},
-color={95,95,95},
-thickness=1)}),
+thickness=2)}),
     Diagram(coordinateSystem(preserveAspectRatio = false, extent={{-300,-430},{110,270}})));
 end DA_Cylinder;
