@@ -12,7 +12,7 @@ model DA_4Cylinder_Validation
   parameter SI.Inertia J = 15 "飞轮转动惯量 [kg·m2]";
   parameter SI.RotationalDampingConstant D = 15 "负载阻尼系数 [N·m·s/rad]";
   parameter SI.AngularVelocity w_start = 100 "初始角速度 [rad/s]";
-  parameter SI.Temperature T_na_default = 673.15 "默认钠热源温度 [K](useExternalTemperature=false 时有效)";
+  parameter SI.Temperature T_na_default = 803.15 "默认钠热源温度(表6: 钠进口530℃; 430℃出口是斯特林取热结果, 不另计) [K](useExternalTemperature=false 时有效)";
   parameter SI.Temperature T_water_default = 303.15 "默认冷却水温度 [K](useExternalTemperature=false 时有效)";
   parameter Boolean useExternalTemperature = false "启用外部温度输入(耦合钠冷快堆一/二回路)";
 
@@ -35,7 +35,7 @@ extent={{-60,-80},{60,80}})));
   DA_Cylinder cyl4(crankAngleOffset = 3*Modelica.Constants.pi/2) annotation(Placement(transformation(extent={{220,-80},{340,80}})));
 
   // ---- 高保真气体动力学(直接驱动各缸 gasForce) ----
-  DA_Gas_Dynamic gas annotation(Placement(transformation(origin={150,-354},
+  .SFR.Stirling.DoubleActing.Gas_Dynamic.DA_Gas_Dynamic gas annotation(Placement(transformation(origin={150,-354},
 extent={{-60,-50},{60,50}})));
 
   Modelica.Blocks.Interfaces.RealInput T_na_ext if useExternalTemperature "外部钠热源温度 [K]" annotation(Placement(transformation(extent={{-140,20},{-100,60}})));
