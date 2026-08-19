@@ -37,21 +37,42 @@ model DA_Gas_Dynamic_test
     annotation(Placement(transformation(origin={-40,-130}, extent={{-10,-10},{10,10}})));
 
   // ---- 被测试的气体动力学组件 ----
-  .SFR.Stirling.DoubleActing.Gas_Dynamic.DA_Gas_Dynamic gas annotation(Placement(transformation(origin={40,0}, extent={{-60,-60},{60,60}})));
+  .SFR.Stirling.DoubleActing.Gas_Dynamic.DA_Gas_Dynamic gas annotation(Placement(transformation(origin={126,-6},
+extent={{-60,-60},{60,60}})));
 
 equation
-  connect(T_na_src.y, gas.T_na) annotation(Line(points={{-99,70},{0,70},{0,18},{-20,18}}, color={0,0,127}));
-  connect(T_water_src.y, gas.T_water) annotation(Line(points={{-99,30},{0,30},{0,6},{-20,6}}, color={0,0,127}));
+  connect(T_na_src.y, gas.T_na) annotation(Line(origin={0,0},
+points={{-99,70},{0,70},{0,80},{102,80},{102,66}},
+color={0,0,127}));
+  connect(T_water_src.y, gas.T_water) annotation(Line(origin={0,0},
+points={{-99,30},{0,30},{0,80},{150,80},{150,66}},
+color={0,0,127}));
 
-  connect(s1.y, gas.s[1]) annotation(Line(points={{-99,-40},{-60,-40},{-60,-30},{-20,-30}}, color={0,0,127}));
-  connect(s2.y, gas.s[2]) annotation(Line(points={{-99,-70},{-20,-70},{-20,-24}}, color={0,0,127}));
-  connect(s3.y, gas.s[3]) annotation(Line(points={{-99,-100},{-20,-100},{-20,-18}}, color={0,0,127}));
-  connect(s4.y, gas.s[4]) annotation(Line(points={{-99,-130},{-20,-130},{-20,-12}}, color={0,0,127}));
+  connect(s1.y, gas.s[1]) annotation(Line(origin={0,0},
+points={{-99,-40},{-60,-40},{-60,30},{54,30}},
+color={0,0,127}));
+  connect(s2.y, gas.s[2]) annotation(Line(origin={0,0},
+points={{-99,-70},{-52,-70},{-52,30},{54,30}},
+color={0,0,127}));
+  connect(s3.y, gas.s[3]) annotation(Line(origin={0,0},
+points={{-99,-100},{-52,-100},{-52,30},{54,30}},
+color={0,0,127}));
+  connect(s4.y, gas.s[4]) annotation(Line(origin={0,0},
+points={{-99,-130},{-52,-130},{-52,30},{54,30}},
+color={0,0,127}));
 
-  connect(v1.y, gas.v[1]) annotation(Line(points={{-29,-40},{0,-40},{0,-70},{-20,-70}}, color={0,0,127}));
-  connect(v2.y, gas.v[2]) annotation(Line(points={{-29,-70},{-20,-70}}, color={0,0,127}));
-  connect(v3.y, gas.v[3]) annotation(Line(points={{-29,-100},{-20,-100},{-20,-76}}, color={0,0,127}));
-  connect(v4.y, gas.v[4]) annotation(Line(points={{-29,-130},{-20,-130},{-20,-82}}, color={0,0,127}));
+  connect(v1.y, gas.v[1]) annotation(Line(origin={0,0},
+points={{-29,-40},{0,-40},{0,-42},{54,-42}},
+color={0,0,127}));
+  connect(v2.y, gas.v[2]) annotation(Line(origin={0,0},
+points={{-29,-70},{40,-70},{40,-42},{54,-42}},
+color={0,0,127}));
+  connect(v3.y, gas.v[3]) annotation(Line(origin={0,0},
+points={{-29,-100},{40,-100},{40,-42},{54,-42}},
+color={0,0,127}));
+  connect(v4.y, gas.v[4]) annotation(Line(origin={0,0},
+points={{-29,-130},{40,-130},{40,-42},{54,-42}},
+color={0,0,127}));
 
   annotation(
     Icon(coordinateSystem(preserveAspectRatio = false)),
