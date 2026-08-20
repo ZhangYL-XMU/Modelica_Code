@@ -93,7 +93,8 @@ model DA_Gas_Dynamic_Tian_TianCheck
     delta_gap = 0.45e-3,      // 田4.2.2节第16条活塞-气缸间隙0.45mm
     A_kg = -11.004,
     B_kg = 0.8130)            // 式3-16后氢气原文系数
-    annotation(Placement(transformation(extent={{33,-112},{133,-12}})));
+    annotation(Placement(transformation(origin={172,-81},
+extent={{-50,-50},{50,50}})));
 
   // ---- 理想绝热极限对照实例(U→∞, 流阻→0, 穿梭→0) ----
   DA_Gas_Dynamic_Tian gasLimit(
@@ -136,8 +137,9 @@ model DA_Gas_Dynamic_Tian_TianCheck
     C_mu = 0.118,
     delta_gap = 0.45e-3,
     A_kg = -11.004,
-    B_kg = 0.8130)
-    annotation(Placement(transformation(extent={{33,12},{133,112}})));
+    B_kg = 0.8130) 
+    annotation(Placement(transformation(origin={154,75},
+extent={{-50,-50},{50,50}})));
 
 equation
   // ---- 启动包络: 1-exp(-t/0.15) ----
@@ -162,20 +164,32 @@ equation
   connect(sOffset.y, add4.u2) annotation(Line(points={{-7,78},{-2,78},{-2,-78},{3,-78}}));
 
   // ---- 位移 → 气体动力学(两实例共用同一运动输入) ----
-  connect(add1.y, gasNominal.s[1]) annotation(Line(points={{23,78},{28,78},{28,-62},{33,-62}}));
-  connect(add2.y, gasNominal.s[2]) annotation(Line(points={{23,26},{28,26},{28,-62},{33,-62}}));
-  connect(add3.y, gasNominal.s[3]) annotation(Line(points={{23,-26},{28,-26},{28,-62},{33,-62}}));
-  connect(add4.y, gasNominal.s[4]) annotation(Line(points={{23,-78},{28,-78},{28,-62},{33,-62}}));
-  connect(add1.y, gasLimit.s[1]) annotation(Line(points={{23,78},{28,78},{28,62},{33,62}}));
-  connect(add2.y, gasLimit.s[2]) annotation(Line(points={{23,26},{28,26},{28,62},{33,62}}));
-  connect(add3.y, gasLimit.s[3]) annotation(Line(points={{23,-26},{28,-26},{28,62},{33,62}}));
-  connect(add4.y, gasLimit.s[4]) annotation(Line(points={{23,-78},{28,-78},{28,62},{33,62}}));
+  connect(add1.y, gasNominal.s[1]) annotation(Line(origin={0,0},
+points={{24,78},{81,78},{81,-78},{111,-78}}));
+  connect(add2.y, gasNominal.s[2]) annotation(Line(origin={0,0},
+points={{24,26},{81,26},{81,-78},{111,-78}}));
+  connect(add3.y, gasNominal.s[3]) annotation(Line(origin={0,0},
+points={{24,-26},{27,-26},{27,-78},{111,-78}}));
+  connect(add4.y, gasNominal.s[4]) annotation(Line(origin={0,0},
+points={{24,-78},{111,-78}}));
+  connect(add1.y, gasLimit.s[1]) annotation(Line(origin={0,0},
+points={{24,78},{93,78}}));
+  connect(add2.y, gasLimit.s[2]) annotation(Line(origin={0,0},
+points={{24,26},{27,26},{27,78},{93,78}}));
+  connect(add3.y, gasLimit.s[3]) annotation(Line(origin={0,0},
+points={{24,-26},{81,-26},{81,78},{93,78}}));
+  connect(add4.y, gasLimit.s[4]) annotation(Line(origin={0,0},
+points={{24,-78},{81,-78},{81,78},{93,78}}));
 
   // ---- 热源/冷源温度(两实例共用) ----
-  connect(T_na_src.y, gasNominal.T_na) annotation(Line(points={{23,-36},{28,-36},{28,-62},{33,-62}}));
-  connect(T_water_src.y, gasNominal.T_water) annotation(Line(points={{23,-88},{28,-88},{28,-62},{33,-62}}));
-  connect(T_na_src.y, gasLimit.T_na) annotation(Line(points={{23,-36},{28,-36},{28,62},{33,62}}));
-  connect(T_water_src.y, gasLimit.T_water) annotation(Line(points={{23,-88},{28,-88},{28,62},{33,62}}));
+  connect(T_na_src.y, gasNominal.T_na) annotation(Line(origin={0,0},
+points={{24,-36},{27,-36},{27,-9},{152,-9},{152,-21}}));
+  connect(T_water_src.y, gasNominal.T_water) annotation(Line(origin={0,0},
+points={{24,-88},{27,-88},{27,-9},{192,-9},{192,-21}}));
+  connect(T_na_src.y, gasLimit.T_na) annotation(Line(origin={0,0},
+points={{24,-36},{27,-36},{27,147},{134,147},{134,135}}));
+  connect(T_water_src.y, gasLimit.T_water) annotation(Line(origin={0,0},
+points={{24,-88},{27,-88},{27,147},{174,147},{174,135}}));
 
   annotation(
     Icon(coordinateSystem(preserveAspectRatio = false)),

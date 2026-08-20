@@ -143,22 +143,28 @@ public
   // ================= 接口(与Stirling_Static风格一致: 位移/温度输入+力输出;
   //                         与DA_Cylinder直连: cyl_i.f_mt ← f[i], cyl_i.s_out → s[i]) =================
   Modelica.Blocks.Interfaces.RealInput s[4] "4缸活塞位移(缸i, s增大=活塞上移) [m]" 
-    annotation (Placement(transformation(origin={-122,6},
-extent={{-20,-20},{20,20}})));
+    annotation (Placement(transformation(origin={-122,6}, extent={{-20,-20},{20,20}}), iconTransformation(origin={-100,10})));
   Modelica.Blocks.Interfaces.RealInput T_na "钠热源温度(表6: 钠进口530°C) [K]" 
-    annotation (Placement(transformation(origin={-40,120}, extent={{-20,-20},{20,20}}, rotation=-90)));
+    annotation (Placement(transformation(origin={-40,120}, extent={{-20,-20},{20,20}}, rotation=-90), iconTransformation(origin={0,100})));
   Modelica.Blocks.Interfaces.RealInput T_water "冷却水温度 [K]" 
-    annotation (Placement(transformation(origin={40,120}, extent={{-20,-20},{20,20}}, rotation=-90)));
+    annotation (Placement(transformation(origin={40,120}, extent={{-20,-20},{20,20}}, rotation=-90), iconTransformation(origin={0,-100})));
   Modelica.Blocks.Interfaces.RealOutput f[4] "4缸活塞净气体力(正=向上, 与位移s正方向一致) [N]" 
-    annotation (Placement(transformation(extent={{100,-40},{140,0}})));
+    annotation (Placement(transformation(origin={120,0},
+extent={{-20,-20},{20,20}})));
   Modelica.Blocks.Interfaces.RealOutput power "总指示功率 [W]" 
-    annotation (Placement(transformation(extent={{100,60},{140,100}})));
+    annotation (Placement(transformation(origin={120,80},
+extent={{-20,-20},{20,20}})));
   Modelica.Blocks.Interfaces.RealOutput Q_in "总吸热量(含穿梭损失, 式4-3的Q_h定义) [W]" 
-    annotation (Placement(transformation(origin={-40,-120}, extent={{-20,-20},{20,20}}, rotation=90)));
+    annotation (Placement(transformation(origin={-40,-120},
+extent={{-20,20},{20,-20}},
+rotation=-90)));
   Modelica.Blocks.Interfaces.RealOutput Q_out "总放热量(含穿梭损失) [W]" 
-    annotation (Placement(transformation(origin={40,-120}, extent={{-20,-20},{20,20}}, rotation=90)));
+    annotation (Placement(transformation(origin={40,-120},
+extent={{-20,20},{20,-20}},
+rotation=-90)));
   Modelica.Blocks.Interfaces.RealOutput eta "热效率 power/Q_in(式3-15) [-]" 
-    annotation (Placement(transformation(extent={{100,-100},{140,-60}})));
+    annotation (Placement(transformation(origin={120,-80},
+extent={{-20,-20},{20,20}})));
 
   // ================= 几何与运动(式3-14正弦容积的一般化: 位移由机械机构给定, 速度为内部变量) =================
   Real v[4] "4缸活塞速度(内部变量; MWORKS编译器禁止der(input), 故用辅助状态一阶高通求导, 等效v=s/(tau_v·s+1), 25Hz下滞后~0.9°) [m/s]";
@@ -385,7 +391,7 @@ equation
     Q_sh[i] = if enableShuttleLoss then K_g*Modelica.Constants.pi*D*S*(T_na - T_water)/(2.0*delta_gap) else 0.0;
 
     // ---- 活塞力(双作用): 上方=循环i热腔, 下方=循环(i-1)冷腔(正=向上, 与位移s正方向一致) ----
-    f[i] = Pc[if i == 1 then 4 else i - 1]*A_bot - Ph[i]*A_top;
+    f[i] = - (Pc[if i == 1 then 4 else i - 1]*A_bot - Ph[i]*A_top);
 
     // ---- 诊断 ----
     NTU[i] = U_reg/(2.0*cp*max(abs(mp_rx[i]), m_upw));
@@ -395,7 +401,7 @@ equation
   end for;
 
   // ---- 总功率与总热量(式3-15: W=W_c+W_e的功率形式; 式4-3: 吸热量含穿梭损失Q_sH) ----
-  power = sum(f .* v);
+  power = sum(-f .* v);
   Q_in = sum(Qh + Q_sh);
   Q_out = sum(Q_sh - Qc);
   eta = power/max(Q_in, 1.0);
@@ -413,6 +419,8 @@ initial equation
   end for;
 
   annotation(
-    Icon(coordinateSystem(preserveAspectRatio = false)),
+    Icon(coordinateSystem(extent={{-100,-100},{100,100}},
+preserveAspectRatio=true,
+grid={2,2})),
     Diagram(coordinateSystem(preserveAspectRatio = false)));
 end DA_Gas_Dynamic_Tian;

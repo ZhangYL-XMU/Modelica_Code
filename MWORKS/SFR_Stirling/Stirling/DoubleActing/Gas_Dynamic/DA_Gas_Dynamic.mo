@@ -1,3 +1,4 @@
+within SFR.Stirling.DoubleActing.Gas_Dynamic;
 model DA_Gas_Dynamic
   // 单组 4 缸双作用斯特林机高保真气体动力学组件(非等温、非稳态控制体积模型)
   // 理论来源: stirling-dymola 三部曲的 3 控制体积方法(热侧/回热器/冷侧、理想气体

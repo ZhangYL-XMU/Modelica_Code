@@ -14,7 +14,7 @@
 | `DA_Gas_Dynamic_Tian.mo` | `SFR.Stirling.DoubleActing.Gas_Dynamic.DA_Gas_Dynamic_Tian` | **主模型**：4 缸双作用斯特林气体动力学（单组 = 1/4 台 1MW 热气机），默认参数 = 侯斌表6/表7 |
 | `DA_Gas_Dynamic_Tian_Test.mo` | `...DA_Gas_Dynamic_Tian_Test` | 测试模型：侯斌工况验证；输入全部为 Modelica 基础库组件（Sine 位移源 + FirstOrder 启动包络 + Derivative 求导 + Constant 温度源 + Product/Add 组合） |
 | `DA_Gas_Dynamic_Tian_TianCheck.mo` | `...DA_Gas_Dynamic_Tian_TianCheck` | 田文静论文复现模型：田表1 参数/氢气/1073K/30.35Hz，含理想绝热极限对照实例；输入全部为 Modelica 基础库组件（Sine 位移源 + FirstOrder 启动包络 + Derivative 求导 + Constant 温度源 + Product/Add 组合） |
-| `DA_Gas_Dynamic_Tian_DA_Demo.mo` | `...DA_Gas_Dynamic_Tian_DA_Demo` | 耦合演示：4×`DA_Cylinder` 曲柄滑块机构 + 曲轴 + 飞轮 + 负载阻尼，三维动画 |
+| `DA_Gas_Dynamic_Tian_DA_Demo.mo` | `...DA_Gas_Dynamic_Tian_DA_Demo` | 耦合演示：4×`DA_Cylinder` 曲柄滑块机构 + 曲轴 + 飞轮 + 负载阻尼，三维动画；热源/冷源温度为 Constant 组件（双击可改） |
 | `package.order` | — | 已追加上述 4 个类名（未改动任何已有模型） |
 
 ## 2 理论基础（田文静论文公式映射）
@@ -135,7 +135,8 @@
 | Q_in | 0.98~1.01 MW ✓ |
 | 能量闭环 | 气体功率 ≈ 负载阻尼耗散 D·w²≈250 kW ✓ |
 
-耦合说明：
+耦合说明（输入组件化原则：温度等输入一律用 Modelica 基础库组件，本任务后续生成的模型均遵循此原则）：
+- 温度：`Constant(T_na_src k=803.15)` / `Constant(T_water_src k=303.15)` 组件直连 `gas.T_na/T_water`；
 - 接口：`cyl_i.f_mt ← −gas.f[i]`、`gas.s[i] ← cyl_i.s_out`、`gas.T_na/T_water` 接外部温度（速度由模型内部对位移自动求导，无需外部提供）；
 - 曲柄相位取负序列 `{0, −π/2, −π, −3π/2}` 适配机构实际负向旋转，保证各缸位移时间相位 0/90/180/270°、热腔领先冷腔 90°（田 4.2.1 节第 9 条）；
 - 飞轮 J=50 kg·m²、负载阻尼 D=10.5 N·m·s/rad，转速自平衡于设计点；

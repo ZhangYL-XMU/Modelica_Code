@@ -1,3 +1,4 @@
+within SFR.Stirling.DoubleActing.Gas_Dynamic;
 model DA_Gas_Dynamic_test
   // 单组 4 缸双作用高保真气体动力学组件的测试驱动模型
   // 用 4 个相位差 90° 的正弦位移/速度源模拟曲柄滑块机构, 验证 DA_Gas_Dynamic 的热力学正确性

@@ -31,11 +31,11 @@ extent={{10,-10},{-10,10}})));
   Modelica.Fluid.Sources.Boundary_ph boundary1(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, p=6e5, h=656775) 
     annotation (Placement(transformation(origin={94,98},
 extent={{10,-10},{-10,10}})));
-  SFR.Fluid.Vessels.MixingVolume volume(nPorts_a=2, nPorts_b=1, redeclare model Geometry = TRANSFORM.Fluid.ClosureRelations.Geometry.Models.LumpedVolume.GenericVolume(V=10), redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+  SFR.Fluid.Vessels.MixingVolume volume(nPorts_a=2, nPorts_b=1, V=10, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
     annotation (Placement(transformation(origin={-50,66},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Vessels.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=2, redeclare model Geometry = TRANSFORM.Fluid.ClosureRelations.Geometry.Models.LumpedVolume.GenericVolume(V=10)) 
+  SFR.Fluid.Vessels.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=2, V=10) 
     annotation (Placement(transformation(origin={-50,-76},
 extent={{-10,-10},{10,10}},
 rotation=90)));

@@ -25,11 +25,11 @@ extent={{10,-10},{-10,10}})));
   Modelica.Fluid.Sources.Boundary_ph boundary1(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, h=656775, p(displayUnit="bar")=100000) 
     annotation (Placement(transformation(origin={88,106},
 extent={{10,-10},{-10,10}})));
-  SFR.Fluid.Vessels.MixingVolume volume(nPorts_a=2, nPorts_b=1, redeclare model Geometry = TRANSFORM.Fluid.ClosureRelations.Geometry.Models.LumpedVolume.GenericVolume(V=10), redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, energyDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, massDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, traceDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial) 
+  SFR.Fluid.Vessels.MixingVolume volume(nPorts_a=2, nPorts_b=1, V=10, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, energyDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, massDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, traceDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial) 
     annotation (Placement(transformation(origin={-56,74},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Vessels.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=2, redeclare model Geometry = TRANSFORM.Fluid.ClosureRelations.Geometry.Models.LumpedVolume.GenericVolume(V=10), energyDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, massDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, traceDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial) 
+  SFR.Fluid.Vessels.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=2, V=10, energyDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, massDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, traceDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial) 
     annotation (Placement(transformation(origin={-56,-68},
 extent={{-10,-10},{10,10}},
 rotation=90)));
