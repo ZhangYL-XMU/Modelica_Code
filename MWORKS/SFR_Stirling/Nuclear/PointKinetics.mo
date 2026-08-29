@@ -41,7 +41,7 @@ parameter SI.Temperature Teffref_coolant(displayUnit = "K") = 773.15 "冷却剂�
 
 //变量
 //SI.Power Q_total   "反应堆总功率";
-SI.Power Q_fission "反应堆裂变功率";
+SI.Power Q_fission(start = Q_nominal) "反应堆裂变功率（点堆动力学状态变量，初值=额定功率）";
 SI.Power Q_decay   "反应堆衰变功率";
 
 Real nt(start = nt_nominal) "中子密度cm-3";
@@ -102,14 +102,14 @@ rotation=270),
 iconTransformation(origin={-1.75,110.25},
 extent={{9.75,-10.25},{-9.75,10.25}},
 rotation=90)));
-Modelica.Blocks.Interfaces.RealOutput Q_HotChannel(start = Q_nominal)
-    "热通道输出功率" 
+Modelica.Blocks.Interfaces.RealOutput Q_innerCore(start = Q_nominal)
+    "堆芯内部输出功率" 
     annotation (Placement(transformation(origin={112.25,-38.5},
 extent={{-11.25,-10.5},{11.25,10.5}}),
 iconTransformation(origin={111.75,-26.75},
 extent={{-9.75,-9.25},{9.75,9.25}})));
-Modelica.Blocks.Interfaces.RealOutput Q_AverageChannel(start = Q_nominal)
-    "平均通道输出功率" 
+Modelica.Blocks.Interfaces.RealOutput Q_outerCore(start = Q_nominal)
+    "堆芯边缘输出功率" 
     annotation (Placement(transformation(origin={112.25,3},
 extent={{-11.25,-10.5},{11.25,10.5}}),
 iconTransformation(origin={111.75,22.25},
@@ -122,8 +122,10 @@ extent={{-10,-10},{10,10}})));
 equation
 //连接
   Power_nt=nt;
-  Q_HotChannel = Q_total * 0.19085525;
-  Q_AverageChannel = Q_total - Q_HotChannel;
+  // FirstLoop 双通道语义：热通道（圈8）份额 = 7634.21/40000 = 0.19085525（侯斌表3）
+  // 注意：FirstLoop_fixed 三通道模型不使用这两个输出，改用 Q_total×0.2237/0.7763（内外堆芯份额）
+  Q_innerCore = Q_total * 0.19085525;
+  Q_outerCore = Q_total - Q_innerCore;
 
 //功率计算
   Q_fission=nt * Sigmaf * v * Ef * 1.6E-19 * 1e6;
@@ -135,15 +137,14 @@ if use_DecayHeat then
   Q_total=Q_fission+Q_in;
   end if;
 
-//点堆动力学
-  //der(nt) = (Reactivity_Total - Beta)/Lambda * nt + sum(lambda_i .* C_i);
+//点堆动力学（功率形式：dQ/dt=(ρ−β)/Λ·Q+ΣλᵢCᵢ；C_i 为功率当量先驱核浓度，初值=稳态值）
   der(Q_fission) = (Reactivity_Total - Beta) / Lambda * Q_fission + sum(lambda_i .* C_i);
   der(C_i) = beta_i / Lambda * Q_fission - lambda_i .* C_i;
 
 //反应性计算
   Reactivity_Fuel = alpha_fuel * log( Teff_fuel / Teffref_fuel);
   Reactivity_Coolant = alpha_coolant * (Teff_coolant - Teffref_coolant);
-  Reactivity_Total = Reactivity_Fuel + Reactivity_Coolant +Reactivity_CR;
+  Reactivity_Total = Reactivity_Fuel + Reactivity_Coolant + Reactivity_CR + Reactivity_Other;
 
   annotation(experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,NumberOfIntervals=500,StartTime=0,StopTime=500,StoreEventValue=0,Tolerance=0.0001));
 end PointKinetics;

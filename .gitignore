@@ -1,0 +1,28 @@
+# ===== 内部工具目录（不上传） =====
+.agent-teams/
+.mnemon/
+
+# ===== 课题信息目录（不上传） =====
+MWORKS/SFR_Stirling/建模文档/
+
+# ===== 个人/本地专用目录 =====
+.idea/
+.vscode/
+*.suo
+*.user
+
+# ===== 操作系统/编辑器杂项 =====
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ===== 日志与临时文件 =====
+*.log
+*.tmp
+*.bak
+*.sw[op]
+*~
+
+# ===== 编译器/构建产物 =====
+temp/
+build/

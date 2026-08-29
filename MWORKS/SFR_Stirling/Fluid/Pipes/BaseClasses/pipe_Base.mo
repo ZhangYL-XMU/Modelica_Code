@@ -36,6 +36,7 @@ model pipe_Base
   final parameter Modelica.Units.SI.Area A_mean = sum(A) / Nw "平均横截面积";
 
   parameter Boolean wallHeatTransfer = true "是否考虑换热" annotation(Dialog(group = "壁面传热"));
+  parameter Modelica.Fluid.Types.Dynamics momentumDynamics = Modelica.Fluid.Types.Dynamics.DynamicFreeInitial "动量方程形式：SteadyState=稳态压降（泵锁总流量+并联分流场景用），否则动态动量" annotation(Dialog(group = "流阻模型"));
   /******************************/
   /*           初始化            */
   /******************************/

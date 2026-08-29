@@ -122,7 +122,11 @@ for i in 1:Nw loop
     /**************************************质量守恒*********************************************/
     der(rho[i]) * V[i] = m_flow[i] * n_pipe - m_flow[i + 1] * n_pipe;
     /**************************************动量守恒*********************************************/
-    der(rho[i] * u[i]) * L[i] = p[i] - p[i + 1] - friction.dp[i];
+    if momentumDynamics == Modelica.Fluid.Types.Dynamics.SteadyState then
+      0 = p[i] - p[i + 1] - friction.dp[i];
+    else
+      der(rho[i] * u[i]) * L[i] = p[i] - p[i + 1] - friction.dp[i];
+    end if;
     /**************************************能量守恒*********************************************/
     der(rho[i] * IE[i]) * V[i] = m_flow[i] * h[i]* n_pipe - m_flow[i+1] * h[i+1] * n_pipe + Q[i] ;
 end for;

@@ -69,7 +69,7 @@ extent={{-15,-15},{15,15}})));
     useAxisFlange = true,
     n = {0,1,0},
     boxWidth = 0.02,
-    s(start = 0.2)) annotation(Placement(transformation(origin={-68,-42.625},
+    s(start = 0.05)) annotation(Placement(transformation(origin={-68,-42.625},
 extent={{-24.375,-78},{24.375,78}},
 rotation=-90)));
   ModelConnectors_Forces gasForce annotation(Placement(transformation(origin={74,-52},

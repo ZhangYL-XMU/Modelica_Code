@@ -1,19 +1,19 @@
 within SFR.Stirling.DoubleActing;
-model DA_Engine
+model DA_Engine_v2
+  // [2026-08-28 修正] 早期结论"删钠侧方程导致机构环无解"系误诊: 根因是测试台飞轮惯性未固定初始条件
+  //   (inertia 无 phi/w fixed=true 时 revolute.phi 被撕裂进无解装配环, DA_Engine 与 v2 同样失败)。
+  //   测试台飞轮加 phi(start=0,fixed=true)+w(start=fixed) 后, 本 v2 封装(T_Na 输入+y=Q_in 输出)
+  //   可正常初始化与仿真(Test.Test_Engine_v2 已验证: power≈181kW/Q_in≈732kW/η≈24.7%, Q_flow=-Q_in)。
+  //   与 DA_Engine(钠端口版)二选一使用: 系统耦合优先 DA_Engine(钠边界直连); 信号驱动场景可用本封装。
   annotation(__MWORKS(version="26.1.3"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})));
-  replaceable package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium;
   import Modelica.Units.SI;
 
   parameter SI.Angle cylinderInclinationAngle=0;
   parameter SI.Angle crankAngleOffset=0;
   parameter Real heff = 1 "传热效率";
   SI.Power power;
-  SI.SpecificEnthalpy hA(start = 506655)  "二回路钠进口焓";
-  SI.SpecificEnthalpy hB(start = 468500)  "二回路钠出口焓";
-  SI.Temperature TA ;
-  SI.Temperature TB ;
-  SI.MassFraction X[1];
+
 
   DA_Cylinder cyl1(crankAngleOffset = crankAngleOffset,cylinderInclinationAngle=cylinderInclinationAngle) annotation(Placement(transformation(origin={-55,-27},
 extent={{-15,-21},{15,21}})));
@@ -29,20 +29,6 @@ extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.Constant const1(k=50+273.15) 
     annotation (Placement(transformation(origin={140,22},
 extent={{10,-10},{-10,10}})));
-  Modelica.Blocks.Sources.RealExpression realExpression(y=TA) 
-    annotation (Placement(transformation(origin={72,30},
-extent={{-10,-10},{10,10}})));
-  // hot_Na.h_outflow=hA(不再 inStream 自指): hA=inStream(hot_Na.h_outflow) 已取上游焓, 端口反向焓直接引用之
-  Modelica.Fluid.Interfaces.FluidPort_a hot_Na(h_outflow = hA, m_flow(start = 280.6)) 
-    annotation (Placement(transformation(origin={-40,100},
-extent={{-10,-10},{10,10}}),
-iconTransformation(origin={-50,102},
-extent={{-10,-10},{10,10}})));
-  Modelica.Fluid.Interfaces.FluidPort_b cold_Na(h_outflow = hB,m_flow(start = -280.6)) 
-    annotation (Placement(transformation(origin={51,100},
-extent={{-10,-10},{10,10}}),
-iconTransformation(origin={50,102},
-extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.MultiBody.Interfaces.Frame_a cylinder_a 
     annotation (Placement(transformation(origin={-82.54,-13.56},
 extent={{-5.54,-5.54},{5.54,5.54}}),
@@ -63,16 +49,16 @@ extent={{-15,-15},{15,15}})));
 extent={{-8,-8},{8,8}}),
 iconTransformation(origin={100,-80},
 extent={{-16,-16},{16,16}})));
+  Modelica.Blocks.Interfaces.RealInput T_Na 
+    annotation (Placement(transformation(origin={0,120},
+extent={{-20,-20},{20,20}},
+rotation=-90)));
+  Modelica.Blocks.Interfaces.RealOutput y 
+    annotation (Placement(transformation(origin={0,-110},
+extent={{-10,-10},{10,10}},
+rotation=-90)));
   equation
   power = dA_Gas_Dynamic_Tian.power;
-  hA = inStream(hot_Na.h_outflow);
-  hA * hot_Na.m_flow = hB * hot_Na.m_flow + dA_Gas_Dynamic_Tian.Q_in * heff ;
-  hot_Na.m_flow + cold_Na.m_flow = 0;
-  hot_Na.p = cold_Na.p;
-
-  TA = Medium.temperature_phX(hot_Na.p,hA,X);
-  TB = Medium.temperature_phX(cold_Na.p,hB,X);
-  X = {1.0}; // 占位组分(钠介质为 MSL PartialSimpleMedium nX=0, temperature_phX 忽略 X; 保持 X[1] 避免空切片编译问题)
 
   connect(cyl1.cylinder_b, cyl2.cylinder_a) 
   annotation(Line(origin={-2,108},
@@ -134,10 +120,6 @@ color={0,0,127}));
   annotation(Line(origin={110,26},
 points={{19,-4},{-2,-4},{-2,-36}},
 color={0,0,127}));
-  connect(realExpression.y, dA_Gas_Dynamic_Tian.T_na) 
-  annotation(Line(origin={93,18},
-points={{-10,12},{7,12},{7,-28}},
-color={0,0,127}));
   connect(cylinder_a, cyl1.cylinder_a) 
   annotation(Line(origin={-84,23},
 points={{1.46,-36.56},{16.7,-36.56}},
@@ -158,4 +140,12 @@ thickness=0.5));
 points={{-4,-36.56},{-16,-36.56}},
 color={95,95,95},
 thickness=0.5),__MWORKS(BlockSystem(NamedSignal)));
-  end DA_Engine;
+  connect(T_Na, dA_Gas_Dynamic_Tian.T_na) 
+  annotation(Line(origin={50,55},
+  points={{-50,65},{50,65},{50,-65}},
+  color={0,0,127}));
+  connect(dA_Gas_Dynamic_Tian.Q_in, y) 
+  annotation(Line(origin={50,-72},
+  points={{50,38},{50,-14},{-50,-14},{-50,-38}},
+  color={0,0,127}));
+  end DA_Engine_v2;

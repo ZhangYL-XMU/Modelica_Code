@@ -8,18 +8,18 @@ extent={{-10,-10},{10,10}})));
     TYThermoFluidSys.Sensors.SensorT TSensor2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
       annotation (Placement(transformation(origin={31,112},
 extent={{-10,-10},{10,10}})));
-    SFR.Fluid.Pipes.pipe pipe1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, initFromEnthalpy=true, h_start=4.725e4,n_pipe=30) 
+    SFR.Fluid.Pipes.pipe pipe1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, initFromEnthalpy=true, h_start=519165,n_pipe=30, m_flow_start=1.34) 
       annotation (Placement(transformation(origin={-3,-6},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-    SFR.Fluid.Pipes.pipe pipe2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, initFromEnthalpy=true, h_start=4.725e4,n_pipe=180) 
+    SFR.Fluid.Pipes.pipe pipe2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, initFromEnthalpy=true, h_start=519165,n_pipe=180, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
       annotation (Placement(transformation(origin={77,-6},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-    SFR.Fluid.Pipes.pipe_static pipe_static1(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, initFromEnthalpy=true, h_start=4.725e4) 
+    Fluid.Pipes.pipe pipe_static1(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, initFromEnthalpy=true, h_start=519165,wallHeatTransfer=false, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
       annotation (Placement(transformation(origin={123,92},
 extent={{-10,-10},{10,10}})));
-    SFR.Fluid.Pipes.pipe_static pipe_static2(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, initFromEnthalpy=true, h_start=4.725e4) 
+    SFR.Fluid.Pipes.pipe pipe_static2(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, initFromEnthalpy=true, h_start=519165, wallHeatTransfer=false, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
       annotation (Placement(transformation(origin={115,-112},
 extent={{10,-10},{-10,10}})));
     SFR.Fluid.Vessels.MixingVolume volume(nPorts_a=2, nPorts_b=1, V=10, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
@@ -42,7 +42,7 @@ extent={{-10,-10},{10,10}})));
     TYThermoFluidSys.Blocks.Constant const3(k=0) 
       annotation (Placement(transformation(origin={-205,63.98375},
 extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=0, duration=100, startTime=400) 
+    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
       annotation (Placement(transformation(origin={-355,13.88505},
 extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Sources.RealExpression realExpression1(y=TSensor2.T) 
@@ -66,13 +66,16 @@ extent={{-10,-10},{10,10}})));
     Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow1 
       annotation (Placement(transformation(origin={45,-6},
 extent={{-10,-10},{10,10}})));
-    TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+    SFR.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
       annotation (Placement(transformation(origin={178.011,-114.009},
 extent={{10,-10},{-10,10}})));
-    Modelica.Fluid.Sources.Boundary_pT boundary(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, p=1e5) 
-      annotation (Placement(transformation(origin={210.011,134.009},
+    SFR.Fluid.Vessels.ExpansionTank expansionTank(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, A=1, V0=0.001, level_start=1, h_start=469125, p_start=100000.0) 
+      annotation (Placement(transformation(origin={156,146},
+extent={{-10,-10},{10,10}})));
+    SFR.Fluid.Vessels.SpecifiedResistance resistance_toBoundary(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
+      annotation (Placement(transformation(origin={146,118},
 extent={{10,-10},{-10,10}})));
-    SFR.Thermal.HeatExchange.HE1 hE1_1 
+    SFR.Thermal.HeatExchange.HE1 hE1_1(shell(momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState)) 
       annotation (Placement(transformation(origin={256.01113,2.009},
 extent={{10,10},{-10,-10}},
 rotation=90)));
@@ -143,14 +146,6 @@ extent={{10,-10},{-10,10}})));
     annotation(Line(origin={-266,13.98375},
     points={{-30,-0.0987},{75.245,-0.09875}},
     color={0,0,127}));
-    connect(pointKinetics.Q_HotChannel, gain.u) 
-    annotation(Line(origin={-123,-5.695},
-    points={{-27.885,-0.305},{28,-0.305}},
-    color={0,0,127}));
-    connect(pointKinetics.Q_AverageChannel, gain1.u) 
-    annotation(Line(origin={-123,17.305},
-    points={{-27.885,-13.26},{8,-13.26},{8,13},{28,13}},
-    color={0,0,127}));
     connect(pipe1.wall[1], prescribedHeatFlow.port) 
     annotation(Line(origin={-17,-6},
     points={{10.2,0},{-10,0}},
@@ -171,10 +166,14 @@ extent={{10,-10},{-10,10}})));
     annotation(Line(origin={158.011,-113.991},
     points={{-10.02226,-0.0180755},{10,-0.018}},
     color={0,178,226}));
-    connect(boundary.ports[1], pipe_static1.portB) 
-    annotation(Line(origin={180.011,114.009},
-    points={{20,20},{-8,20},{-8,-24.0181},{-23.9778,-24.0181}},
-    color={0,127,255}));
+    connect(expansionTank.port, resistance_toBoundary.port_a) 
+    annotation(Line(origin={210.011,120.009},
+points={{-54.011,17.591},{-54.011,-2.009},{-57.011,-2.009}},
+color={0,127,255}));
+    connect(resistance_toBoundary.port_b, pipe_static1.portB) 
+    annotation(Line(origin={189.011,101.009},
+points={{-50.011,16.991},{-50.011,5},{-52.9888,5},{-52.9888,-9.02708},{-55.9888,-9.02708}},
+color={0,127,255}));
     connect(hE1_1.shell_out, pump1.port_a) 
     annotation(Line(origin={219.011,-60.991},
     points={{30.7982,52.8},{30.7982,-53.018},{-31,-53.018}},
@@ -191,4 +190,12 @@ extent={{10,-10},{-10,10}})));
     annotation(Line(origin={292.01113,39.009},
     points={{30,27},{-30.0018,27},{-30.0018,-26.8}},
     color={0,127,255}));
+    connect(pointKinetics.Q_outerCore, gain1.u) 
+    annotation(Line(origin={-123,17},
+    points={{-27.885,-12.955},{-1,-12.955},{-1,13.305},{28,13.305}},
+    color={0,0,127}));
+    connect(pointKinetics.Q_innerCore, gain.u) 
+    annotation(Line(origin={-123,-6},
+    points={{-27.885,0},{28,0}},
+    color={0,0,127}));
     end FirstLoop;

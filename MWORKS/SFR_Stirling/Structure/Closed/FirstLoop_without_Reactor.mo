@@ -2,18 +2,18 @@ within SFR.Structure.Closed;
 model FirstLoop_without_Reactor
   annotation(__MWORKS(version="26.2.1"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})));
-  TRANSFORM.Fluid.Volumes.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=2, redeclare model Geometry = TRANSFORM.Fluid.ClosureRelations.Geometry.Models.LumpedVolume.GenericVolume(V=10), energyDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, massDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, traceDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial) 
+  SFR.Fluid.Vessels.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=2, V=10) 
     annotation (Placement(transformation(origin={-70,-80},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  TRANSFORM.Fluid.Volumes.MixingVolume volume(nPorts_a=2, nPorts_b=1, redeclare model Geometry = TRANSFORM.Fluid.ClosureRelations.Geometry.Models.LumpedVolume.GenericVolume(V=10), redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, energyDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, massDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, traceDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial) 
+  SFR.Fluid.Vessels.MixingVolume volume(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=2, nPorts_b=1, V=10) 
     annotation (Placement(transformation(origin={-70,62},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Pipes.pipe_static pipe_static2(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, h_start=469125) 
+  Fluid.Pipes.pipe pipe_static2(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, h_start=469125,wallHeatTransfer=false, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
     annotation (Placement(transformation(origin={14,-110},
 extent={{10,-10},{-10,10}})));
-  SFR.Fluid.Pipes.pipe_static pipe_static1(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, h_start=469125) 
+  Fluid.Pipes.pipe pipe_static1(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, h_start=469125,wallHeatTransfer=false, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
     annotation (Placement(transformation(origin={22,94},
 extent={{-10,-10},{10,10}})));
   Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow fixedHeatFlow1(Q_flow=0) 
@@ -22,11 +22,11 @@ extent={{-10,-10},{10,10}})));
   Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow fixedHeatFlow(Q_flow=0) 
     annotation (Placement(transformation(origin={-138,-4},
 extent={{-10,-10},{10,10}})));
-  SFR.Fluid.Pipes.pipe pipe2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, h_start=469125) 
+  SFR.Fluid.Pipes.pipe pipe2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, h_start=469125, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
     annotation (Placement(transformation(origin={-24,-4},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Pipes.pipe pipe1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, h_start=469125) 
+  SFR.Fluid.Pipes.pipe pipe1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, h_start=469125, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
     annotation (Placement(transformation(origin={-104,-4},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -36,10 +36,13 @@ extent={{-10,-10},{10,10}})));
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
     annotation (Placement(transformation(origin={54,-110.018},
 extent={{10,-10},{-10,10}})));
-  Modelica.Fluid.Sources.Boundary_pT boundary(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, p=1e5) 
-    annotation (Placement(transformation(origin={86,138},
+  SFR.Fluid.Vessels.ExpansionTank expansionTank(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, A=1, V0=0.001, level_start=1, h_start=469125, p_start=100000.0) 
+    annotation (Placement(transformation(origin={106,136},
+extent={{-10,-10},{10,10}})));
+  SFR.Fluid.Vessels.SpecifiedResistance resistance_toBoundary(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
+    annotation (Placement(transformation(origin={86,110},
 extent={{10,-10},{-10,10}})));
-  SFR.Thermal.HeatExchange.HE1 hE1_1 
+  SFR.Thermal.HeatExchange.HE1 hE1_1(shell(momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState)) 
     annotation (Placement(transformation(origin={132,6},
 extent={{10,10},{-10,-10}},
 rotation=90)));
@@ -90,9 +93,13 @@ color={0,127,255}));
   annotation(Line(origin={34,-110},
   points={{-10.02226,-0.0180755},{10,-0.0180755}},
   color={0,178,226}));
-  connect(boundary.ports[1], pipe_static1.portB) 
-  annotation(Line(origin={56,118},
-points={{20,20},{-8,20},{-8,-24.0181},{-23.9778,-24.0181}},
+  connect(expansionTank.port, resistance_toBoundary.port_a) 
+  annotation(Line(origin={86,124},
+points={{20,3.6},{20,-14},{7,-14}},
+color={0,127,255}));
+  connect(resistance_toBoundary.port_b, pipe_static1.portB) 
+  annotation(Line(origin={65,105},
+points={{14,5},{-29.9778,5},{-29.9778,-11.0181},{-32.9778,-11.0181}},
 color={0,127,255}));
   connect(hE1_1.shell_out, pump1.port_a) 
   annotation(Line(origin={95,-57},

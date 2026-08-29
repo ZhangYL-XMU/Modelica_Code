@@ -1,95 +1,104 @@
 within SFR.Structure.Closed;
-model SecondLoop
+model SecondLoop_ExpTank "二回路膨胀箱版：串联回路（泵→HE1管侧→引擎热端→引擎→冷端→泵）+ 死端膨胀箱定压（参照 TRANSFORM IHTS5_AHX3）"
   annotation(__MWORKS(version="26.1.3"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.001,StartTime=0,StopTime=10,StoreEventValue=0,Tolerance=0.0001));
   // ========== 主回路组件 ==========
   Thermal.HeatExchange.HE1 hE1_1(shell(h_start=656775), tube(h_start=656775)) 
-    annotation(Placement(transformation(origin={-42,57},
-extent={{-10,10},{10,-10}},
-rotation=90)));
+    annotation(Placement(transformation(origin={-158,22},
+extent={{10,-10},{-10,10}},
+rotation=-90)));
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-    annotation(Placement(transformation(origin={46,96},
+    annotation(Placement(transformation(origin={-110,66},
 extent={{10,-10},{-10,10}})));
   // ========== 膨胀箱定压支路（参照 IHTS5_AHX3：死端膨胀箱经固定流阻接冷段） ==========
-  SFR.Fluid.Vessels.ExpansionTank expansionTank(
+  TRANSFORM.Fluid.Volumes.ExpansionTank_1Port expansionTank(
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     A=1,
     V0=0.001,
     level_start=1,
     h_start=506655,
     p_start=100000.0) 
-    annotation(Placement(transformation(origin={38,158},
+    annotation(Placement(transformation(origin={-214,-34},
 extent={{-10,-10},{10,10}})));
-  SFR.Fluid.Vessels.SpecifiedResistance resistance_toExpTank(
+  TRANSFORM.Fluid.FittingsAndResistances.SpecifiedResistance resistance_toExpTank(
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
-    annotation(Placement(transformation(origin={76,126},
-extent={{10,-10},{-10,10}})));
+    annotation(Placement(transformation(origin={-176,-30},
+extent={{-10,-10},{10,10}})));
   // ========== 壳侧回路 ==========
   Modelica.Fluid.Sources.MassFlowSource_T boundary4(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, m_flow=8, T=823.15) 
-    annotation(Placement(transformation(origin={-102,4},
+    annotation(Placement(transformation(origin={-190,-4},
 extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Sources.Boundary_pT boundary(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, T=713.15, p=100000.0) 
-    annotation(Placement(transformation(origin={-106,96},
+    annotation(Placement(transformation(origin={-194,60},
 extent={{-10,-10},{10,10}})));
   // ========== 引擎+机械部分：与 SFR.Stirling.DoubleActing.Test_Engine 逐字同构（含 Placement） ==========
   Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
-        displayUnit="1") = {1,0,0}) annotation(Placement(transformation(origin={-6,-22},
-extent={{-10,10},{10,-10}})));
+        displayUnit="1") = {1,0,0}) annotation (Placement(transformation(origin={-8,24.8},
+extent={{10,10},{-10,-10}})));
   inner Modelica.Mechanics.MultiBody.World world 
-    annotation(Placement(transformation(origin={-22,8},
+    annotation (Placement(transformation(origin={-60,65.4},
 extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2) 
-    annotation(Placement(transformation(origin={8,-126},
-extent={{10,-10},{-10,10}})));
+    annotation (Placement(transformation(origin={-28,-40},
+extent={{-10,-10},{10,10}})));
   Stirling.DoubleActing.DA_Engine dA_Engine 
-    annotation(Placement(transformation(origin={76,-61},
-extent={{-30,-29},{30,29}})));
-  Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={62,-164},
+    annotation(Placement(transformation(origin={94.5,48},
+extent={{-30.5,-29},{30.5,29}})));
+  Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={-86,-64},
 extent={{-10,-10},{10,10}})));
-  Modelica.Mechanics.Rotational.Components.Damper damper(d = 15) annotation(Placement(transformation(origin={62,-134},
-extent={{-10,-10},{10,10}})));
+  Modelica.Mechanics.Rotational.Components.Damper damper(d = 15) annotation(Placement(transformation(origin={-68,-40},
+extent={{10,-10},{-10,10}})));
   equation
   // ---------- 主回路（泵→HE1管侧→引擎热端→引擎→冷端→泵） ----------
   connect(pump2.port_b, hE1_1.tube_in) 
-  annotation(Line(origin={192,8},
-points={{-156,88},{-228.00181,88},{-228.00181,59.2}}));
+  annotation(Line(origin={0,0},
+points={{-120,66},{-152.00181,66},{-152.00181,32.2}}));
   connect(hE1_1.tube_out, dA_Engine.hot_Na) 
-  annotation(Line(origin={192,8},
-points={{-228.00181,38.8},{-228.00181,23.48},{-131,23.48},{-131,-39.42}}));
+  annotation(Line(origin={0,0},
+points={{-152.00181,11.8},{-152.00181,6.75},{-59.58,6.75}}));
   connect(dA_Engine.cold_Na, pump2.port_a) 
-  annotation(Line(origin={192,8},
-points={{-101,-39.42},{-101,88},{-136,88}}));
+  annotation(Line(origin={0,0},
+points={{-59.58,37.25},{-100,37.25},{-100,66}}));
   // ---------- 膨胀箱定压支路（接冷段三通） ----------
   connect(resistance_toExpTank.port_a, dA_Engine.cold_Na) 
-  annotation(Line(origin={326,222},
-points={{-240,-96},{-235,-96},{-235,-253.42}}));
+  annotation(Line(origin={0,0},
+points={{-166,-30},{-59.58,-30},{-59.58,37.25}}));
   connect(expansionTank.port, resistance_toExpTank.port_b) 
-  annotation(Line(origin={326,222},
-points={{-288,-72.4},{-288,-96},{-260,-96}}));
+  annotation(Line(origin={0,0},
+points={{-214,-43},{-214,-30},{-186,-30}}));
   // ---------- 壳侧（流量源→HE1壳侧→定压） ----------
   connect(boundary4.ports[1], hE1_1.shell_in) 
-  annotation(Line(origin={192,8},
-points={{-284,-4},{-240.20181,-4},{-240.20181,38.8}}));
+  annotation(Line(origin={0,0},
+points={{-180,-4},{-164.20181,-4},{-164.20181,11.8}}));
   connect(hE1_1.shell_out, boundary.ports[1]) 
-  annotation(Line(origin={192,8},
-points={{-240.20181,59.2},{-240.20181,88},{-288,88}}));
+  annotation(Line(origin={0,0},
+points={{-164.20181,32.2},{-164.20181,60},{-184,60}}));
   // ---------- 机械侧（同 Test_Engine） ----------
   connect(world.frame_b, revolute.frame_b) 
-  annotation(Line(origin={192,8},
-points={{-204,0},{-184.4,0},{-184.4,-30},{-188,-30}}));
+  annotation(Line(origin={-66,-6},
+points={{-60,48},{-52,48},{-52,-20},{-36,-20}},
+color={95,95,95},
+thickness=0.5));
   connect(inertia.flange_b, revolute.axis) 
-  annotation(Line(origin={-4,-22},
-points={{2,-104},{-2,-104},{-2,-10}}));
+  annotation(Line(origin={-66,-6},
+points={{-44,-64},{-26,-64},{-26,-30}},
+color={0,0,0}));
   connect(world.frame_b, dA_Engine.cylinder_a) 
-  annotation(Line(origin={192,8},
-points={{-204,0},{-152.8,0},{-152.8,-51.6},{-146,-51.6}}));
+  annotation(Line(origin={-66,-6},
+points={{-60,48},{-17.04,48},{-17.04,35.233074},{67.2571,35.233074}},
+color={95,95,95},
+thickness=0.5));
   connect(revolute.frame_a, dA_Engine.cylinder_a1) 
-  annotation(Line(origin={192,8},
-points={{-208,-30},{-211.6,-30},{-211.6,-92.2},{-146,-92.2}}));
+  annotation(Line(origin={-40,-4},
+points={{-42,-22},{-30,-22},{-30,22.5029},{41.2571,22.5029}},
+color={95,95,95},
+thickness=0.5));
   connect(damper.flange_b, fixed_ground.flange) 
-  annotation(Line(origin={160,-194},
-points={{-88,60},{-88,36},{-98,36},{-98,30}}));
+  annotation(Line(origin={42,-50},
+points={{-120,10},{-128,10},{-128,-14}},
+color={0,0,0}));
   connect(damper.flange_a, inertia.flange_a) 
-  annotation(Line(origin={160,-194},
-points={{-108,60},{-122,60},{-122,68},{-142,68}}));
-  end SecondLoop;
+  annotation(Line(origin={-44,-40},
+points={{-14,0},{6,0}},
+color={0,0,0}));
+  end SecondLoop_ExpTank;
