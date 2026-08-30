@@ -2,7 +2,7 @@ within SFR.Stirling.DoubleActing.Test;
 model Test_Engine_v2
   annotation(__MWORKS(version="26.6.0",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=50,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.001,StartTime=0,StopTime=50,StoreEventValue=0,Tolerance=0.0001));
-  Modelica.Mechanics.Rotational.Components.Damper damper(d=15) annotation(Placement(transformation(origin={-88.5,-120.2},
+  Modelica.Mechanics.Rotational.Components.Damper damper(d=10.14) annotation(Placement(transformation(origin={-88.5,-120.2},
 extent={{10,-10},{-10,10}})));
   Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={-106.5,-144.2},
 extent={{-10,-10},{10,10}})));

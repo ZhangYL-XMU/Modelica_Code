@@ -42,16 +42,16 @@ extent={{-18,-20.5},{18,20.5}})));
     annotation (Placement(transformation(origin={-330,8.4013},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
-    annotation (Placement(transformation(origin={-322,8.4013},
+    annotation (Placement(transformation(origin={-372,8.4013},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Nonlinear.Limiter limPID(uMin=-0.021, uMax=0.021) 
     annotation (Placement(transformation(origin={-288,8.4},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Gain gain_uS(k=1/40e6) "u_s 归一化(ramp W→无量纲)" 
-    annotation (Placement(transformation(origin={-348,8.4},
+    annotation (Placement(transformation(origin={-424,8.4013},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Gain gain_uM(k=1/40e6) "u_m 归一化(Q_total W→无量纲)" 
-    annotation (Placement(transformation(origin={-322,-24},
+    annotation (Placement(transformation(origin={-404,-21.52875},
 extent={{-10,-10},{10,10}})));
   TYThermoFluidSys.Blocks.Constant const1(k=0) 
     annotation (Placement(transformation(origin={-254,30.5},
@@ -60,7 +60,7 @@ extent={{-10,-10},{10,10}})));
     annotation (Placement(transformation(origin={-220,58.5},
 extent={{-10,-10},{10,10}})));
   TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
-    annotation (Placement(transformation(origin={-370,8.4013},
+    annotation (Placement(transformation(origin={-460,8.4},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[3] * 0.2237 + outerCore.T[3] * 0.7763) 
     annotation (Placement(transformation(origin={-254,-62.5},
@@ -97,7 +97,7 @@ extent={{-10,-10},{10,10}})));
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=2, n_pipe=54, L_total=1.5, Dh=0.0415, height_ab=-1.5,
     initFromEnthalpy=true, h_start=519165, wallHeatTransfer=false,
-    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=0.13) 
+    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=0.00926 "单管0.5/54") 
     annotation (Placement(transformation(origin={77.9819245,-6},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -106,7 +106,7 @@ rotation=90)));
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=2, n_pipe=37, L_total=0.25, Dh=0.0415, height_ab=-0.25,
     initFromEnthalpy=true, h_start=519165, wallHeatTransfer=false,
-    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.65) 
+    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.695 "单管62.7/37") 
     annotation (Placement(transformation(origin={-80,-30},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -114,7 +114,7 @@ rotation=90)));
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=5, n_pipe=37, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1,
     initFromEnthalpy=true, h_start=519165, wallHeatTransfer=true,
-    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.65) 
+    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.695 "单管62.7/37") 
     annotation (Placement(transformation(origin={-80,-6},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -122,7 +122,7 @@ rotation=90)));
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=2, n_pipe=37, L_total=0.15, Dh=0.0415, height_ab=-0.15,
     initFromEnthalpy=true, h_start=656775, wallHeatTransfer=false,
-    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.65) 
+    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.695 "单管62.7/37") 
     annotation (Placement(transformation(origin={-80,18},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -131,7 +131,7 @@ rotation=90)));
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=2, n_pipe=114, L_total=0.25, Dh=0.0415, height_ab=-0.25,
     initFromEnthalpy=true, h_start=519165, wallHeatTransfer=false,
-    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.86) 
+    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.907 "单管217.4/114") 
     annotation (Placement(transformation(origin={6,-30},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -139,7 +139,7 @@ rotation=90)));
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=5, n_pipe=114, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1,
     initFromEnthalpy=true, h_start=519165, wallHeatTransfer=true,
-    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.86) 
+    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.907 "单管217.4/114") 
     annotation (Placement(transformation(origin={6,-6},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -147,21 +147,21 @@ rotation=90)));
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=2, n_pipe=114, L_total=0.15, Dh=0.0415, height_ab=-0.15,
     initFromEnthalpy=true, h_start=656775, wallHeatTransfer=false,
-    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.86) 
+    momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.907 "单管217.4/114") 
     annotation (Placement(transformation(origin={6,18},
 extent={{-10,-10},{10,10}},
 rotation=90)));
 
   // ================= 流量分配阻力（三路独立，R=1000/m_target） =================
-  SFR.Fluid.Vessels.SpecifiedResistance resistance_shield(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=1000/7.0) 
+  SFR.Fluid.Vessels.SpecifiedResistance resistance_shield(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=6280 "屏蔽+反射等温流道 0.5 kg/s(R迭代: 2000*1.57/0.5)") 
     annotation (Placement(transformation(origin={78,-68},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Vessels.SpecifiedResistance resistance_outer(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=1000/212.4) 
+  SFR.Fluid.Vessels.SpecifiedResistance resistance_outer(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=4.30 "外堆芯 217.4 kg/s(R迭代2: 4.48*(213.6/217.4)收紧)") 
     annotation (Placement(transformation(origin={6,-68},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Vessels.SpecifiedResistance resistance_inner(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=1000/61.2) 
+  SFR.Fluid.Vessels.SpecifiedResistance resistance_inner(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=20.6 "内堆芯 62.7 kg/s(R迭代3: 20.0*(64.3/62.7)收紧→出口550)") 
     annotation (Placement(transformation(origin={-79.9819,-68},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -271,10 +271,10 @@ points={{31,102},{31,92},{6,92},{6,76}},
 color={0,178,226}));
   // ---- 点堆控制与反馈（与 FirstLoop 相同） ----
   connect(pointKinetics.Q_total, gain_uM.u) annotation (Line(origin={-15,-5.48375},
-points={{-150.885,13.68},{-147.13,13.68},{-147.13,-38},{-341,-38},{-341,-24}},
+points={{-150.885,13.68},{-147.13,13.68},{-147.13,-32.045},{-405,-32.045},{-405,-16.045},{-401,-16.045}},
 color={0,0,127}));
   connect(gain_uM.y, PID_error.u2) annotation (Line(origin={-320,-12},
-points={{0,-12},{0,20}},
+points={{-73,-9.52875},{-68,-9.52875},{-68,14.4013},{-64,14.4013}},
 color={0,0,127}));
   connect(const1.y, pointKinetics.Reactivity_Other) annotation (Line(origin={-15,-5.48375},
 points={{-228,35.98375},{-200,35.98375},{-200,4.25},{-190.755,4.25}},
@@ -289,13 +289,13 @@ color={0,0,127}));
 points={{-190.755,-5.8975},{-228,-5.8975}},
 color={0,0,127}));
   connect(ramp.y, gain_uS.u) annotation (Line(origin={-360,10},
-points={{-10,-1.6},{0,-1.6},{0,0},{12,0}},
+points={{-89,-1.6},{-76,-1.5987}},
 color={0,0,127}));
   connect(gain_uS.y, PID_error.u1) annotation (Line(origin={-330,10},
-points={{18,-1.6},{8,-1.6}},
+points={{-83,-1.5987},{-58,-1.5987},{-58,4.4013},{-54,4.4013}},
 color={0,0,127}));
   connect(PID_error.y, PID.u) annotation (Line(origin={-322,0},
-points={{0,-24},{0,-12}},
+points={{-39,8.4013},{-20,8.4013}},
 color={0,0,127}));
   connect(PID.y, limPID.u) annotation (Line(origin={-302,8},
 points={{-10,0.4},{4,0.4}},

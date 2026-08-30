@@ -3,7 +3,7 @@ model DA_Engine_v2
   // [2026-08-28 修正] 早期结论"删钠侧方程导致机构环无解"系误诊: 根因是测试台飞轮惯性未固定初始条件
   //   (inertia 无 phi/w fixed=true 时 revolute.phi 被撕裂进无解装配环, DA_Engine 与 v2 同样失败)。
   //   测试台飞轮加 phi(start=0,fixed=true)+w(start=fixed) 后, 本 v2 封装(T_Na 输入+y=Q_in 输出)
-  //   可正常初始化与仿真(Test.Test_Engine_v2 已验证: power≈181kW/Q_in≈732kW/η≈24.7%, Q_flow=-Q_in)。
+  //   可正常初始化与仿真(Test.Test_Engine_v2 2026-08-30 标定后: power=250kW/Q_in=713kW/eta=35.1%, Q_flow=-Q_in)。标定: 仅换热系数 U_h=2e4/U_c=2e5/U_reg=1e6, 其余参数与论文一致, 详见建模文档/斯特林发动机功率标定_20260830.md
   //   与 DA_Engine(钠端口版)二选一使用: 系统耦合优先 DA_Engine(钠边界直连); 信号驱动场景可用本封装。
   annotation(__MWORKS(version="26.1.3"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})));

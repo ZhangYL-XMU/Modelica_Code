@@ -1,8 +1,8 @@
 within SFR.Thermal.HeatExchange;
 model HE1
   "中间热交换器 IHX：一次侧（壳程，SFR 钠）放热 550→440 ℃ @280.6 kg/s；二次侧（管程，SFR 钠）吸热 430→530 ℃ @308.4 kg/s"
+  "几何/换热参数已提升到顶层（图形层双击本组件可编辑）：n_tubes/L_total/管径壁厚/CF_HeatTransfer/N 等"
   "壳/管侧动量均为 SteadyState：壳侧接锁流量泵、管侧接锁流量源+定压边界，动态动量无必要且易压力奇异"
-  "几何：Φ16×1.2 换热管 360 根（r_inner=0.0136 内径 / r_outer=0.016 外径，管壁厚 1.2 mm）、L=2 m；壳侧当量直径 Dh=0.016 m"
   annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=100,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=100,StoreEventValue=0,Tolerance=0.0001),Icon(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2}),graphics = {Rectangle(origin={0,0},
@@ -23,14 +23,32 @@ fillPattern=FillPattern.Solid,
 extent={{73,6},{-73,-6}}), Line(origin={-40,0},
 points={{20,40},{-20,30},{20,20},{-20,10},{20,0},{-20,-10},{20,-20},{-20,-30},{20,-40}}), Line(origin={40,0},
 points={{20,40},{-20,30},{20,20},{-20,10},{20,0},{-20,-10},{20,-20},{-20,-30},{20,-40}})}));
-  TYThermoFluidSys.Thermal.TubeWall tubeWall(N=4,r_inner(displayUnit="mm")=0.0136,r_outer(displayUnit="mm")=0.016,length=2,T_reference=fill(273.15+440,4),exposeState_a=true,exposeState_b=true,T_start=fill(298.15+440, 4)) 
+  // ===== 顶层参数（图形层可编辑；默认值 = 已验证的标定状态） =====
+  parameter Integer n_tubes = 360 "换热管根数（4 台 IHX 合并等效）" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length L_total = 2 "换热管/壳程长度 [m]" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length Dh_tube = 0.0136 "管侧水力直径（管内径）[m]" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length Dh_shell = 0.016 "壳侧当量直径 [m]" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length r_wall_in = 0.0136 "管壁内半径 [m]（课题口径：与管内径同值，勿改）" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length r_wall_out = 0.016 "管壁外半径 [m]（课题口径：与管外径同值，勿改）" annotation(Dialog(group="几何"));
+  parameter Integer N = 5 "每侧节点数" annotation(Dialog(group="网格"));
+  parameter Real CF_HeatTransfer = 2.5 "换热能力修正系数（标定：4 台 IHX 合并等效；增大=换热更强）" annotation(Dialog(tab="换热标定"));
+  parameter Modelica.Units.SI.Temperature T_wall_ref = 713.15 "管壁参考温度 [K]（440℃）" annotation(Dialog(tab="初始化"));
+  parameter Modelica.Units.SI.Temperature T_wall_init = 738.15 "管壁初始温度 [K]（465℃）" annotation(Dialog(tab="初始化"));
+  TYThermoFluidSys.Thermal.TubeWall tubeWall(N=N - 1,
+    r_inner(displayUnit="mm")=r_wall_in,
+    r_outer(displayUnit="mm")=r_wall_out,
+    length=L_total,
+    T_reference=fill(T_wall_ref, N - 1),
+    exposeState_a=true,
+    exposeState_b=true,
+    T_start=fill(T_wall_init, N - 1)) 
     annotation (Placement(transformation(origin={7.10543e-15,-8},
     extent={{-10,-10},{10,10}},
     rotation=90)));
-  SFR.Fluid.Pipes.pipe shell(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, L_total=2, Dh(displayUnit="mm")=0.016, n_pipe=360,T_wall_start=713.15,m_flow_start=1, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
+  SFR.Fluid.Pipes.pipe shell(N=N, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, L_total=L_total, Dh(displayUnit="mm")=Dh_shell, n_pipe=n_tubes,T_wall_start=T_wall_ref,m_flow_start=1, CF_HeatTransfer=CF_HeatTransfer, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
     annotation (Placement(transformation(origin={7.10543e-15,-62},
     extent={{-10,-10},{10,10}})));
-  SFR.Fluid.Pipes.pipe tube(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, L_total=2, n_pipe=360, Dh(displayUnit="mm")=0.0136,T_wall_start=713.15,m_flow_start=1, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
+  SFR.Fluid.Pipes.pipe tube(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=N, L_total=L_total, n_pipe=n_tubes, Dh(displayUnit="mm")=Dh_tube,T_wall_start=T_wall_ref,m_flow_start=1, CF_HeatTransfer=CF_HeatTransfer, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
     annotation (Placement(transformation(origin={7.10543e-15,59.9819},
     extent={{-10,-10},{10,10}},
     rotation=180)));
@@ -46,7 +64,7 @@ points={{20,40},{-20,30},{20,20},{-20,10},{20,0},{-20,-10},{20,-20},{-20,-30},{2
   Modelica.Fluid.Interfaces.FluidPort_b shell_out(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium) 
     annotation (Placement(transformation(origin={102,-62.0181},
     extent={{-10,-10},{10,10}})));
-  SFR.Thermal.HeatExchange.CounterFlowPair counterFlow(n=4, counterCurrent=true) 
+  SFR.Thermal.HeatExchange.CounterFlowPair counterFlow(n=N - 1, counterCurrent=true) 
     annotation (Placement(transformation(origin={7.10543e-15,29.4864},
     extent={{-10,-10},{10,10}},
     rotation=90)));

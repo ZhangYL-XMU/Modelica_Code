@@ -15,7 +15,7 @@ extent={{-10,-10},{10,10}})));
       annotation (Placement(transformation(origin={-357.982,-56.5},
 extent={{-10,-10},{10,10}})));
     TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
-      annotation (Placement(transformation(origin={-473.982,14.4013},
+      annotation (Placement(transformation(origin={-572,14.4013},
 extent={{-10,-10},{10,10}})));
     TYThermoFluidSys.Blocks.Constant const3(k=0) 
       annotation (Placement(transformation(origin={-323.982,64.5},
@@ -24,19 +24,19 @@ extent={{-10,-10},{10,10}})));
       annotation (Placement(transformation(origin={-357.982,36.5},
 extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Math.Gain gain_uM(k=1/40e6) "u_m 归一化(Q_total W→无量纲)" 
-      annotation (Placement(transformation(origin={-425.982,-18},
+      annotation (Placement(transformation(origin={-474,-30},
 extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Math.Gain gain_uS(k=1/40e6) "u_s 归一化(ramp W→无量纲)" 
-      annotation (Placement(transformation(origin={-451.982,14.4},
+      annotation (Placement(transformation(origin={-518,14.4013},
 extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Nonlinear.Limiter limPID(uMin=-0.021, uMax=0.021) 
       annotation (Placement(transformation(origin={-391.982,14.4},
 extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
-      annotation (Placement(transformation(origin={-425.982,14.4013},
+      annotation (Placement(transformation(origin={-480,8.4013},
 extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.SteadyState) 
-      annotation (Placement(transformation(origin={-433.982,14.4013},
+      annotation (Placement(transformation(origin={-435.991,14.4013},
 extent={{-10,-10},{10,10}})));
     SFR.Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K"), Teffref_coolant(displayUnit="degC")=768.15 "参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
       annotation (Placement(transformation(origin={-289.982,0},
@@ -312,11 +312,11 @@ points={{31,102},{31,92},{6,92},{6,76}},
 color={0,178,226}));
     connect(pointKinetics.Q_total, gain_uM.u) 
     annotation(Line(origin={-118.982,0.51625},
-points={{-150.885,13.68},{-147.13,13.68},{-147.13,-38},{-341,-38},{-341,-18.51625},{-319,-18.51625}},
+points={{-150.885,13.68},{-147.13,13.68},{-147.13,-46.51625},{-371.018,-46.51625},{-371.018,-30.51625},{-367.018,-30.51625}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
     connect(gain_uM.y, PID_error.u2) 
     annotation(Line(origin={-423.982,-6},
-points={{9,-12},{9,14.4013},{-14,14.4013}},
+points={{-39.018,-24},{12,-24},{12,-8},{-72.018,-8},{-72.018,8.4013},{-68.018,8.4013}},
 color={0,0,127}));
     connect(const1.y, pointKinetics.Reactivity_Other) 
     annotation(Line(origin={-118.982,0.51625},
@@ -336,19 +336,19 @@ points={{-190.755,-5.8975},{-228,-5.89755}},
 color={0,0,127}));
     connect(ramp.y, gain_uS.u) 
     annotation(Line(origin={-463.982,16},
-points={{0,-1.6},{0,-1.6}},
+points={{-97.018,-1.5987},{-66.018,-1.5987}},
 color={0,0,127}));
     connect(gain_uS.y, PID_error.u1) 
     annotation(Line(origin={-433.982,16},
-points={{-7,-1.6},{-7,4.4013},{-4,4.4013}},
+points={{-73.018,-1.5987},{-58.018,-1.5987}},
 color={0,0,127}));
     connect(PID_error.y, PID.u) 
     annotation(Line(origin={-425.982,6},
-points={{11,8.4013},{-20,8.4013}},
+points={{-43.018,2.4013},{-26.009,2.4013},{-26.009,8.4013},{-22.009,8.4013}},
 color={0,0,127}));
     connect(PID.y, limPID.u) 
     annotation(Line(origin={-405.982,14},
-points={{-17,0.4013},{2,0.4}},
+points={{-19.009,0.4013},{2,0.4}},
 color={0,0,127}));
     connect(limPID.y, pointKinetics.Reactivity_CR) 
     annotation(Line(origin={-118.982,0.51625},

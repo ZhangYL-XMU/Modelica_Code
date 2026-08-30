@@ -13,8 +13,8 @@ within SFR.Media.Sodium;
 
     extends Modelica.Media.Interfaces.PartialSimpleMedium(
       mediumName="SimpleLiquidSodium",
-      cp_const=1251,
-      cv_const=1076,
+      cp_const=1296,
+      cv_const=1121,
       d_const=863,
       eta_const=2.9957e-4,
       lambda_const=71.016,

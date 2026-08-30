@@ -56,7 +56,8 @@ model pipe
     L = L,
     Dhyd = Dhyd,
     A = A,
-    m_flow = m_flow_avg
+    m_flow = m_flow_avg,
+    CF = CF_HeatTransfer
     );
   annotation(Icon(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})));

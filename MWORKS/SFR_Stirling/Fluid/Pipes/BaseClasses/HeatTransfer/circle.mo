@@ -16,6 +16,7 @@ input Modelica.Units.SI.Area[Nw] A;
   //输入变量
 
 input Medium.ThermodynamicState[Nf] states "热力状态(ph)";
+  input Real CF = 1.0 "换热能力修正系数";
 input Medium.MassFlowRate m_flow[Nw] "质量流";
 
   //热力学参数
@@ -54,7 +55,7 @@ equation
     Nu[i] = 5.5 + 0.025 * (Re[i] * Pr[i]) ^ 0.8;
     gamma[i] = Nu[i] * k[i] / Dhyd[i];
 
-    Q[i] = gamma[i] * Nt * Constants.pi * Dhyd[i] * L[i] * (Tw[i] - Tf[i]);
+    Q[i] = CF * gamma[i] * Nt * Constants.pi * Dhyd[i] * L[i] * (Tw[i] - Tf[i]);
   end for;
 
 
