@@ -1,4 +1,4 @@
-within SFR.Media.Utilities;
+within SFR.Media.Functions;
 function lambda_T
   input Modelica.Units.SI.Temperature T;
   output Modelica.Units.SI.ThermalConductivity lambda;

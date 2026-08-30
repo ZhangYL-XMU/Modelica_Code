@@ -1,6 +1,9 @@
 d_T
+d_T_der
 eta_dT
 lambda_T
 cp_T
+cp_T_der
 h_T
+h_T_der
 beta_T

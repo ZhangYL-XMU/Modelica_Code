@@ -19,7 +19,7 @@ extent={{10,10},{-10,-10}})));
   DA_Engine_v2 Engine 
     annotation (Placement(transformation(origin={53.25,-32.14},
 extent={{-30.75,-28.9},{30.75,28.9}})));
-  Modelica.Blocks.Sources.Ramp ramp(offset=591755, height=40000, startTime=5, duration=10) 
+  Modelica.Blocks.Sources.Ramp ramp(offset=631755, height=0, startTime=5, duration=10) 
     annotation (Placement(transformation(origin={-126,90.018},
 extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Sources.MassFlowSource_h boundary(nPorts=1, redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, h=631755, m_flow=308.4, use_h_in=true) 
@@ -38,7 +38,7 @@ rotation=90)));
   Modelica.Blocks.Sources.RealExpression realExpression(y=- Engine.y) 
     annotation (Placement(transformation(origin={-118,44},
 extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Sources.RealExpression realExpression1(y=530+273.15) 
+  Modelica.Blocks.Sources.RealExpression realExpression1(y=Engine_pipe.T[1]) 
     annotation (Placement(transformation(origin={26,42},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Gain gain(k=1) // 双重反号修复: realExpression(y=-Engine.y) 已反号, gain 必须 k=1 使 Q_flow=-Q_in(引擎从钠取热) 

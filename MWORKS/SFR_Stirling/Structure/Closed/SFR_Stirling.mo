@@ -1,235 +1,448 @@
 within SFR.Structure.Closed;
   model SFR_Stirling
-    annotation(__MWORKS(version="26.1.3"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2})));
-    TYThermoFluidSys.Sensors.SensorT TSensor1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={-170.506,50.8213},
-  extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Sensors.SensorT TSensor2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={-102.506,122},
-  extent={{-10,-10},{10,10}})));
-    SFR.Fluid.Pipes.pipe pipe1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, initFromEnthalpy=true, h_start=4.725e4) 
-      annotation (Placement(transformation(origin={-136.506,4},
-  extent={{-10,-10},{10,10}},
-  rotation=90)));
-    SFR.Fluid.Pipes.pipe pipe2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, N=5, height_ab=-10, initFromEnthalpy=true, h_start=4.725e4) 
-      annotation (Placement(transformation(origin={-56.5056,4},
-  extent={{-10,-10},{10,10}},
-  rotation=90)));
-    SFR.Fluid.Pipes.pipe_static pipe_static1(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, initFromEnthalpy=true, h_start=4.725e4) 
-      annotation (Placement(transformation(origin={-10.5056,102},
-  extent={{-10,-10},{10,10}})));
-    SFR.Fluid.Pipes.pipe_static pipe_static2(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, initFromEnthalpy=true, h_start=4.725e4) 
-      annotation (Placement(transformation(origin={-18.5056,-102},
-  extent={{10,-10},{-10,10}})));
-    SFR.Fluid.Vessels.MixingVolume volume(nPorts_a=2, nPorts_b=1, V=10, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={-102.506,70},
-  extent={{-10,-10},{10,10}},
-  rotation=90)));
-    SFR.Fluid.Vessels.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=2, V=10) 
-      annotation (Placement(transformation(origin={-102.506,-72},
-  extent={{-10,-10},{10,10}},
-  rotation=90)));
-    SFR.Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K"), Teffref_coolant(displayUnit="degC")=785.15) 
-      annotation (Placement(transformation(origin={-304.506,9.48375},
-  extent={{-18,-20.5},{18,20.5}})));
-    Modelica.Blocks.Continuous.LimPID PID(controllerType=Modelica.Blocks.Types.SimpleController.PID, yMax=0.021, initType=Modelica.Blocks.Types.Init.SteadyState, withFeedForward=false, k=2, wd=1) 
-      annotation (Placement(transformation(origin={-440.506,23.8851},
-  extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Blocks.Constant const1(k=0) 
-      annotation (Placement(transformation(origin={-372.506,45.9838},
-  extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Blocks.Constant const3(k=0) 
-      annotation (Placement(transformation(origin={-338.506,73.9838},
-  extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
-      annotation (Placement(transformation(origin={-488.506,23.8851},
-  extent={{-10,-10},{10,10}})));
-    Modelica.Blocks.Sources.RealExpression realExpression1(y=TSensor2.T) 
-      annotation (Placement(transformation(origin={-372.506,-47.0162},
-  extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Blocks.Constant const2(k=823.15) 
-      annotation (Placement(transformation(origin={-372.506,4.1025},
-  extent={{-10,-10},{10,10}})));
-    Modelica.Blocks.Math.Gain gain(k=1) 
-      annotation (Placement(transformation(origin={-216.506,4},
-  extent={{-10,-10},{10,10}})));
-    Modelica.Blocks.Math.Gain gain1(k=1) 
-      annotation (Placement(transformation(origin={-216.506,40.305},
-  extent={{-10,-10},{10,10}})));
-    Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow 
-      annotation (Placement(transformation(origin={-170.506,4},
-  extent={{-10,-10},{10,10}})));
-    Modelica.Blocks.Sources.RealExpression realExpression2(y=gain1.y) 
-      annotation (Placement(transformation(origin={-112.506,4},
-  extent={{-10,-10},{10,10}})));
-    Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow1 
-      annotation (Placement(transformation(origin={-88.5056,4},
-  extent={{-10,-10},{10,10}})));
+    annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=7.2,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
+grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=3600,StoreEventValue=0,Tolerance=0.0001));
+    SFR.Fluid.Vessels.ExpansionTank expansionTank(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, A=1, V0=0.001, level_start=1, h_start=656775 "热段550℃", p_start=100000.0) 
+      annotation (Placement(transformation(origin={50.0181,160},
+extent={{-10,-10},{10,10}})));
     TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={44.5054,-104.009},
-  extent={{10,-10},{-10,10}})));
-    Modelica.Fluid.Sources.Boundary_pT boundary(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, p=1e5) 
-      annotation (Placement(transformation(origin={76.505435,144.009},
-  extent={{10,-10},{-10,10}})));
-    SFR.Thermal.HeatExchange.HE1 hE1_1 
-      annotation (Placement(transformation(origin={122.506,12.009},
-  extent={{10,10},{-10,-10}},
-  rotation=90)));
-    TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={196,-19.9066},
-  extent={{10,-10},{-10,10}})));
-    Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
-          displayUnit="1") = {1,0,0}) annotation (Placement(transformation(origin={238,212},
-extent={{-10,-10},{10,10}},
-rotation=180)));
-    inner Modelica.Mechanics.MultiBody.World world 
-      annotation (Placement(transformation(origin={174,212},
-extent={{-10,-10},{10,10}})));
-    Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2) 
-      annotation (Placement(transformation(origin={258,160},
-extent={{-10,-10},{10,10}})));
-    Stirling.StirlingEngine.Engine_V2 stirling(heff=0.25) 
-      annotation (Placement(transformation(origin={319,8.91514},
-extent={{-51.084865,41},{51.084865,-41}},
-rotation=-90)));
-    Modelica.Fluid.Sources.Boundary_pT boundary1(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, p=1e5) 
-      annotation (Placement(transformation(origin={154,84},
+      annotation (Placement(transformation(origin={46.0181,-126.018},
 extent={{10,-10},{-10,10}})));
+    TYThermoFluidSys.Blocks.Constant const2(k=823.15) 
+      annotation (Placement(transformation(origin={-357.982,-5.3813},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[3] * 0.2237 + outerCore.T[3] * 0.7763) 
+      annotation (Placement(transformation(origin={-357.982,-56.5},
+extent={{-10,-10},{10,10}})));
+    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
+      annotation (Placement(transformation(origin={-473.982,14.4013},
+extent={{-10,-10},{10,10}})));
+    TYThermoFluidSys.Blocks.Constant const3(k=0) 
+      annotation (Placement(transformation(origin={-323.982,64.5},
+extent={{-10,-10},{10,10}})));
+    TYThermoFluidSys.Blocks.Constant const1(k=0) 
+      annotation (Placement(transformation(origin={-357.982,36.5},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Math.Gain gain_uM(k=1/40e6) "u_m 归一化(Q_total W→无量纲)" 
+      annotation (Placement(transformation(origin={-425.982,-18},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Math.Gain gain_uS(k=1/40e6) "u_s 归一化(ramp W→无量纲)" 
+      annotation (Placement(transformation(origin={-451.982,14.4},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Nonlinear.Limiter limPID(uMin=-0.021, uMax=0.021) 
+      annotation (Placement(transformation(origin={-391.982,14.4},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
+      annotation (Placement(transformation(origin={-425.982,14.4013},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.SteadyState) 
+      annotation (Placement(transformation(origin={-433.982,14.4013},
+extent={{-10,-10},{10,10}})));
+    SFR.Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K"), Teffref_coolant(displayUnit="degC")=768.15 "参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
+      annotation (Placement(transformation(origin={-289.982,0},
+extent={{-18,-20.5},{18,20.5}})));
+    SFR.Fluid.Vessels.MixingVolume volume1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=3, V=10, h_start=519165 "下腔室440℃") 
+      annotation (Placement(transformation(origin={-97.9819,-120},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Vessels.MixingVolume volume(nPorts_a=3, nPorts_b=1, V=10, h_start=656775 "上腔室550℃", redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+      annotation (Placement(transformation(origin={-97.9819,76},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe pipe_static2(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, L_total=10, Dh=0.30, initFromEnthalpy=true, h_start=519165 "冷段440℃", wallHeatTransfer=false, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
+      annotation (Placement(transformation(origin={0.0180755,-126},
+extent={{10,-10},{-10,10}})));
+    SFR.Fluid.Pipes.pipe pipe_static1(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, L_total=10, Dh=0.30, initFromEnthalpy=true, h_start=656775 "热段550℃", wallHeatTransfer=false, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
+      annotation (Placement(transformation(origin={19.0181,98},
+extent={{-10,-10},{10,10}})));
+    Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_outer[4] 
+      annotation (Placement(transformation(origin={-124.982,0},
+extent={{-6,-6},{6,6}})));
+    SFR.Fluid.Vessels.SpecifiedResistance resistance_toBoundary(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
+      annotation (Placement(transformation(origin={68.0180755,124},
+extent={{-10,-10},{10,10}})));
+    TYThermoFluidSys.Sensors.SensorT TSensor2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+      annotation (Placement(transformation(origin={-72.9819,118},
+extent={{-10,-10},{10,10}})));
+    Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_inner[4] 
+      annotation (Placement(transformation(origin={-201.982,0},
+extent={{-6,-6},{6,6}})));
+    Modelica.Blocks.Math.Gain gain_outer(k=31051.69/40000/4) "外堆芯功率份额/4：31051.69/40000/4" 
+      annotation (Placement(transformation(origin={-151.982,0},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Math.Gain gain_inner(k=8948.31/40000/4) "内堆芯功率份额/4：8948.31/40000/4" 
+      annotation (Placement(transformation(origin={-235.982,0},
+extent={{-10,-10},{10,10}})));
+    SFR.Fluid.Vessels.SpecifiedResistance resistance_inner(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=1000/61.2) 
+      annotation (Placement(transformation(origin={-183.964,-62},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Vessels.SpecifiedResistance resistance_outer(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=1000/212.4) 
+      annotation (Placement(transformation(origin={-97.9819,-62},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Vessels.SpecifiedResistance resistance_shield(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=1000/7.0) 
+      annotation (Placement(transformation(origin={-25.9819,-62},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe outerCore_out(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      N=2, n_pipe=114, L_total=0.15, Dh=0.0415, height_ab=-0.15,
+      initFromEnthalpy=true, h_start=656775, wallHeatTransfer=false,
+      momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.86) 
+      annotation (Placement(transformation(origin={-97.9819,24},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe outerCore(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      N=5, n_pipe=114, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1,
+      initFromEnthalpy=true, h_start=519165, wallHeatTransfer=true,
+      momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.86) 
+      annotation (Placement(transformation(origin={-97.9819,0},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe outerCore_in(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      N=2, n_pipe=114, L_total=0.25, Dh=0.0415, height_ab=-0.25,
+      initFromEnthalpy=true, h_start=519165, wallHeatTransfer=false,
+      momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.86) 
+      annotation (Placement(transformation(origin={-97.9819,-24},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe innerCore_out(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      N=2, n_pipe=37, L_total=0.15, Dh=0.0415, height_ab=-0.15,
+      initFromEnthalpy=true, h_start=656775, wallHeatTransfer=false,
+      momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.65) 
+      annotation (Placement(transformation(origin={-183.982,24},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe innerCore(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      N=5, n_pipe=37, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1,
+      initFromEnthalpy=true, h_start=519165, wallHeatTransfer=true,
+      momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.65) 
+      annotation (Placement(transformation(origin={-183.982,0},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe innerCore_in(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      N=2, n_pipe=37, L_total=0.25, Dh=0.0415, height_ab=-0.25,
+      initFromEnthalpy=true, h_start=519165, wallHeatTransfer=false,
+      momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.65) 
+      annotation (Placement(transformation(origin={-183.982,-24},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    SFR.Fluid.Pipes.pipe shieldReflector(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      N=2, n_pipe=54, L_total=1.5, Dh=0.0415, height_ab=-1.5,
+      initFromEnthalpy=true, h_start=519165, wallHeatTransfer=false,
+      momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=0.13) 
+      annotation (Placement(transformation(origin={-26,0},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    TYThermoFluidSys.Sensors.SensorT TSensor1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+      annotation (Placement(transformation(origin={-225.982,66},
+extent={{-10,-10},{10,10}})));
+    SFR.Thermal.HeatExchange.HE1 hE1_1(shell(momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState)) 
+      annotation (Placement(transformation(origin={152.029,8.009},
+extent={{10,10},{-10,-10}},
+rotation=90)));
+    TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+      annotation (Placement(transformation(origin={214.5,58},
+extent={{10,-10},{-10,10}})));
+    Modelica.Blocks.Math.Gain gain(k=1) 
+      annotation (Placement(transformation(origin={232.5,-64},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Sources.RealExpression realExpression2(y=Engine_pipe.T[1]) 
+      annotation (Placement(transformation(origin={372,-57.86},
+extent={{-10,-10},{10,10}})));
+    Modelica.Blocks.Sources.RealExpression realExpression(y=- Engine.y * 4 * 10) 
+      annotation (Placement(transformation(origin={180.5,-64},
+extent={{-10,-10},{10,10}})));
+    Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow 
+      annotation (Placement(transformation(origin={265.5,-38},
+extent={{-10,-10},{10,10}},
+rotation=90)));
+    Fluid.Pipes.pipe Engine_pipe(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium,N=5,L_total=5,m_flow_start=100) 
+      annotation (Placement(transformation(origin={265.5,-14},
+extent={{-10,10},{10,-10}})));
+    Stirling.DoubleActing.DA_Engine_v2 Engine 
+      annotation (Placement(transformation(origin={399.25,-132},
+extent={{-30.75,-28.9},{30.75,28.9}})));
+    Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
+          displayUnit="1") = {1,0,0}) annotation(Placement(transformation(origin={317.5,-155.26},
+extent={{10,10},{-10,-10}})));
+    inner Modelica.Mechanics.MultiBody.World world 
+      annotation(Placement(transformation(origin={265.5,-114.66},
+extent={{-10,-10},{10,10}})));
+    Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=100, fixed=true)) 
+      annotation(Placement(transformation(origin={297.5,-220.06},
+extent={{-10,-10},{10,10}})));
+    Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={239.5,-244.06},
+extent={{-10,-10},{10,10}})));
+    Modelica.Mechanics.Rotational.Components.Damper damper(d=15) annotation(Placement(transformation(origin={257.5,-220.06},
+extent={{10,-10},{-10,10}})));
+    SFR.Fluid.Vessels.SpecifiedResistance resistance_toExpTank(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
+      annotation(Placement(transformation(origin={258.5,84},
+extent={{10,-10},{-10,10}})));
+    SFR.Fluid.Vessels.ExpansionTank expansionTank1(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      A=1,
+      V0=0.001,
+      level_start=1,
+      h_start=506655,
+      p_start=100000.0) 
+      annotation(Placement(transformation(origin={232.5,108},
+extent={{-10,-10},{10,10}})));
+    SFR.Fluid.Vessels.MixingVolume volumeTube(
+      redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
+      nPorts_a=1, nPorts_b=1, V=1, h_start=656775 "热段550℃") 
+      annotation(Placement(transformation(origin={218.5,-14},
+extent={{-10,-10},{10,10}})));
     equation
-    connect(TSensor1.port_a, pipe1.portB) 
-    annotation(Line(origin={-153.506,19},
-    points={{-17,21.8213},{-17,1},{17.0181,1},{17.0181,-4.9778}},
-    color={0,178,226}));
-    connect(volume.port_b[1], pipe_static1.portA) 
-    annotation(Line(origin={-61.5056,89},
-    points={{-41,-13},{-41,12.9819},{41.02226,12.9819}},
-    color={0,127,255}));
-    connect(volume.port_a[1], pipe1.portB) 
-    annotation(Line(origin={-119.506,39},
-    points={{17,25},{-16.9819,25},{-16.9819,-24.9778}},
-    color={0,127,255}));
-    connect(volume.port_a[2], pipe2.portB) 
-    annotation(Line(origin={-79.5056,39},
-    points={{-23,25},{23.0181,25},{23.0181,-24.9778}},
-    color={0,127,255}));
-    connect(pipe1.portA, volume1.port_b[1]) 
-    annotation(Line(origin={-119.506,-36},
-    points={{-16.9819,30.02226},{-16.9819,-6},{17,-6},{17,-30}},
-    color={0,127,255}));
-    connect(pipe2.portA, volume1.port_b[2]) 
-    annotation(Line(origin={-79.5056,-36},
-    points={{23.0181,30.02226},{23.0181,-6},{-23,-6},{-23,-30}},
-    color={0,127,255}));
-    connect(volume1.port_a[1], pipe_static2.portB) 
-    annotation(Line(origin={-65.5056,-90},
-    points={{-37,12},{-37,-12.0181},{36.9778,-12.0181}},
-    color={0,127,255}));
+    connect(innerCore_out.portB, volume.port_a[1]) 
+    annotation(Line(origin={-103.982,6},
+points={{-79.9819,28.0222},{-79.9819,48},{6,48},{6,64}},
+color={0,127,255}));
+    connect(TSensor1.port_a, innerCore_out.portB) 
+    annotation(Line(origin={-138.482,6},
+points={{-87.5,50},{-87.5,31.0222},{-45.4819,31.0222},{-45.4819,28.0222}},
+color={0,178,226}));
+    connect(outerCore_out.portB, volume.port_a[2]) 
+    annotation(Line(origin={-128.982,6},
+points={{31.0181,28.0222},{31,64}},
+color={0,127,255}));
+    connect(shieldReflector.portB, volume.port_a[3]) 
+    annotation(Line(origin={-103.982,6},
+points={{78,4.0222},{78,48},{6,48},{6,64}},
+color={0,127,255}));
+    connect(innerCore_out.portA, innerCore.portB) 
+    annotation(Line(origin={-163.982,6},
+points={{-19.9819,8.02226},{-19.9819,4.0222}},
+color={0,127,255}));
+    connect(innerCore.portA, innerCore_in.portB) 
+    annotation(Line(origin={-163.982,6},
+points={{-19.9819,-15.97774},{-19.9819,-19.9778}},
+color={0,127,255}));
+    connect(outerCore_out.portA, outerCore.portB) 
+    annotation(Line(origin={-174.982,6},
+points={{77.0180755,8.02226},{77.0180755,4.0222}},
+color={0,127,255}));
+    connect(outerCore.portA, outerCore_in.portB) 
+    annotation(Line(origin={-174.982,6},
+points={{77.0180755,-15.97774},{77.0180755,-19.9778}},
+color={0,127,255}));
+    connect(innerCore_in.portA, resistance_inner.port_b) 
+    annotation(Line(origin={-103.982,6},
+points={{-79.9819,-39.97774},{-79.9819,-58}},
+color={0,127,255}));
+    connect(outerCore_in.portA, resistance_outer.port_b) 
+    annotation(Line(origin={-103.982,6},
+points={{6.0180755,-39.97774},{6,-58}},
+color={0,127,255}));
+    connect(shieldReflector.portA, resistance_shield.port_b) 
+    annotation(Line(origin={-103.982,6},
+points={{78,-15.97774},{78,-58}},
+color={0,127,255}));
+    connect(volume1.port_b[1], resistance_shield.port_a) 
+    annotation(Line(origin={-103.982,6},
+points={{6,-120},{6,-100},{78,-100},{78,-78}},
+color={0,127,255}));
+    connect(volume1.port_b[2], resistance_inner.port_a) 
+    annotation(Line(origin={-103.982,6},
+points={{6,-120},{6,-100},{-79.9819,-100},{-79.9819,-78}},
+color={0,127,255}));
+    connect(volume1.port_b[3], resistance_outer.port_a) 
+    annotation(Line(origin={-103.982,6},
+points={{6,-120},{6,-78}},
+color={0,127,255}));
+    connect(pointKinetics.Q_total, gain_inner.u) 
+    annotation(Line(origin={-103.982,6},
+points={{-165.885,8.19625},{-154,8.19625},{-154,-6},{-144,-6}},
+color={0,0,127}));
+    connect(pointKinetics.Q_total, gain_outer.u) 
+    annotation(Line(origin={-103.982,6},
+points={{-165.885,8.19625},{-92,8.19625},{-92,5.02226},{-64,5.02226},{-64,-6},{-60,-6}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(gain_inner.y, prescribedHeatFlow_inner[1].Q_flow) 
+    annotation(Line(origin={-129.482,6},
+points={{-95.5,-6},{-78.5,-6}},
+color={0,0,127}));
+    connect(gain_inner.y, prescribedHeatFlow_inner[2].Q_flow) 
+    annotation(Line(origin={-129.482,6},
+points={{-95.5,-6},{-78.5,-6}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(gain_inner.y, prescribedHeatFlow_inner[3].Q_flow) 
+    annotation(Line(origin={-129.482,6},
+points={{-95.5,-6},{-78.5,-6}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(gain_inner.y, prescribedHeatFlow_inner[4].Q_flow) 
+    annotation(Line(origin={-129.482,6},
+points={{-95.5,-6},{-78.5,-6}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(gain_outer.y, prescribedHeatFlow_outer[1].Q_flow) 
+    annotation(Line(origin={-174.982,6},
+points={{34,-6},{44,-6}},
+color={0,0,127}));
+    connect(gain_outer.y, prescribedHeatFlow_outer[2].Q_flow) 
+    annotation(Line(origin={-174.982,6},
+points={{34,-6},{44,-6}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(gain_outer.y, prescribedHeatFlow_outer[3].Q_flow) 
+    annotation(Line(origin={-174.982,6},
+points={{34,-6},{44,-6}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(gain_outer.y, prescribedHeatFlow_outer[4].Q_flow) 
+    annotation(Line(origin={-174.982,6},
+points={{34,-6},{44,-6}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(prescribedHeatFlow_inner.port, innerCore.wall) 
+    annotation(Line(origin={-163.982,6},
+points={{-32,-6},{-23.8,-6}},
+color={127,0,0}));
+    connect(prescribedHeatFlow_outer.port, outerCore.wall) 
+    annotation(Line(origin={-174.982,6},
+points={{56,-6},{73.2,-6}},
+color={127,0,0}));
     connect(TSensor2.port_a, volume.port_b[1]) 
-    annotation(Line(origin={-92.5056,94},
-    points={{-10,18},{-10,-18}},
-    color={0,178,226}));
-    connect(pointKinetics.Q_total, PID.u_m) 
-    annotation(Line(origin={-325.506,4.98375},
-    points={{41.115,18.69625},{49,18.69625},{49,-35},{-115,-35},{-115,6.9013}},
-    color={0,0,127}));
+    annotation(Line(origin={-103.982,6},
+points={{31,102},{31,92},{6,92},{6,76}},
+color={0,178,226}));
+    connect(pointKinetics.Q_total, gain_uM.u) 
+    annotation(Line(origin={-118.982,0.51625},
+points={{-150.885,13.68},{-147.13,13.68},{-147.13,-38},{-341,-38},{-341,-18.51625},{-319,-18.51625}},
+color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
+    connect(gain_uM.y, PID_error.u2) 
+    annotation(Line(origin={-423.982,-6},
+points={{9,-12},{9,14.4013},{-14,14.4013}},
+color={0,0,127}));
     connect(const1.y, pointKinetics.Reactivity_Other) 
-    annotation(Line(origin={-342.506,29.9837},
-    points={{-19,16.00005},{-12,16.00005},{-12,-15.7337},{18.245,-15.7337}},
-    color={0,0,127}));
+    annotation(Line(origin={-118.982,0.51625},
+points={{-228,35.98375},{-200,35.98375},{-200,4.25},{-190.755,4.25}},
+color={0,0,127}));
     connect(realExpression1.y, pointKinetics.Teff_coolant) 
-    annotation(Line(origin={-335.506,-9.01625},
-    points={{-26,-38},{7.49,-38},{7.49,2.97125},{11.245,2.97125}},
-    color={0,0,127}));
+    annotation(Line(origin={-118.982,0.51625},
+points={{-228,-57.01625},{-200,-57.01625},{-200,-16.045},{-190.755,-16.045}},
+color={0,0,127}));
     connect(const3.y, pointKinetics.Q_in) 
-    annotation(Line(origin={-316.506,52.9838},
-    points={{-11,21},{10,21},{10,-20.89875},{11.685,-20.89875}},
-    color={0,0,127}));
+    annotation(Line(origin={-118.982,0.51625},
+points={{-194,63.98375},{-171.315,63.98375},{-171.315,22.085}},
+color={0,0,127}));
     connect(pointKinetics.Teff_fuel, const2.y) 
-    annotation(Line(origin={-342.506,3.98375},
-    points={{18.245,0.11875},{-19,0.11875}},
-    color={0,0,127}));
-    connect(ramp.y, PID.u_s) 
-    annotation(Line(origin={-465.506,24.9936},
-    points={{-12,-1.10855},{13,-1.10855}},
-    color={0,0,127}));
-    connect(PID.y, pointKinetics.Reactivity_CR) 
-    annotation(Line(origin={-399.506,23.9838},
-    points={{-30,-0.0987},{75.245,-0.09875}},
-    color={0,0,127}));
-    connect(pointKinetics.Q_HotChannel, gain.u) 
-    annotation(Line(origin={-256.506,4.305},
-    points={{-27.885,-0.305},{28,-0.305}},
-    color={0,0,127}));
-    connect(pointKinetics.Q_AverageChannel, gain1.u) 
-    annotation(Line(origin={-256.506,27.305},
-    points={{-27.885,-13.26},{8,-13.26},{8,13},{28,13}},
-    color={0,0,127}));
-    connect(pipe1.wall[1], prescribedHeatFlow.port) 
-    annotation(Line(origin={-150.506,4},
-    points={{10.2,0},{-10,0}},
-    color={127,0,0}));
-    connect(gain.y, prescribedHeatFlow.Q_flow) 
-    annotation(Line(origin={-192.506,4},
-    points={{-13,0},{12,0}},
-    color={0,0,127}));
-    connect(realExpression2.y, prescribedHeatFlow1.Q_flow) 
-    annotation(Line(origin={-87.5056,4},
-    points={{-14,0},{-11,0}},
-    color={0,0,127}));
-    connect(pipe2.wall[1], prescribedHeatFlow1.port) 
-    annotation(Line(origin={-69.5056,4},
-    points={{9.2,0},{-9,0}},
-    color={127,0,0}));
+    annotation(Line(origin={-118.982,0.51625},
+points={{-190.755,-5.8975},{-228,-5.89755}},
+color={0,0,127}));
+    connect(ramp.y, gain_uS.u) 
+    annotation(Line(origin={-463.982,16},
+points={{0,-1.6},{0,-1.6}},
+color={0,0,127}));
+    connect(gain_uS.y, PID_error.u1) 
+    annotation(Line(origin={-433.982,16},
+points={{-7,-1.6},{-7,4.4013},{-4,4.4013}},
+color={0,0,127}));
+    connect(PID_error.y, PID.u) 
+    annotation(Line(origin={-425.982,6},
+points={{11,8.4013},{-20,8.4013}},
+color={0,0,127}));
+    connect(PID.y, limPID.u) 
+    annotation(Line(origin={-405.982,14},
+points={{-17,0.4013},{2,0.4}},
+color={0,0,127}));
+    connect(limPID.y, pointKinetics.Reactivity_CR) 
+    annotation(Line(origin={-118.982,0.51625},
+points={{-262,13.88375},{-190.755,13.885}},
+color={0,0,127}));
+    connect(volume.port_b[1], pipe_static1.portA) 
+    annotation(Line(origin={-103.982,6},
+points={{6,76},{6,91.9819245},{113.02226,91.9819245}},
+color={0,127,255}));
+    connect(volume1.port_a[1], pipe_static2.portB) 
+    annotation(Line(origin={-103.982,6},
+points={{6,-132},{93.9778,-132.018}},
+color={0,127,255}));
     connect(pipe_static2.portA, pump1.port_b) 
-    annotation(Line(origin={24.5054,-103.991},
-    points={{-33.03326,1.97292},{10,1.97292},{10,-0.018}},
-    color={0,178,226}));
-    connect(boundary.ports[1], pipe_static1.portB) 
-    annotation(Line(origin={46.5054,124.009},
-    points={{20,20},{-8,20},{-8,-22.0271},{-46.9888,-22.0271}},
-    color={0,127,255}));
+    annotation(Line(origin={-103.982,6},
+points={{113.97774,-132.018},{140,-132.018}},
+color={0,178,226}));
+    connect(expansionTank.port, resistance_toBoundary.port_a) 
+    annotation(Line(origin={-103.982,6},
+points={{154,145.6},{154,118},{162,118}},
+color={0,127,255}));
+    connect(resistance_toBoundary.port_b, pipe_static1.portB) 
+    annotation(Line(origin={-103.982,6},
+points={{182,118},{185,118},{185,91.9819245},{133.0222,91.9819245}},
+color={0,127,255}));
     connect(hE1_1.shell_out, pump1.port_a) 
-    annotation(Line(origin={85.505435,-50.991},
-    points={{30.7983,52.8},{30.7983,-53.018},{-31,-53.018}},
-    color={0,127,255}));
+    annotation(Line(origin={-103.982,6},
+points={{249.809,-8.191},{249.809,-132.018},{160,-132.018}},
+color={0,127,255}));
     connect(hE1_1.shell_in, pipe_static1.portB) 
-    annotation(Line(origin={69.505435,61.009},
-    points={{46.7983,-38.8},{46.7983,40.9729},{-69.9888,40.9729}},
+    annotation(Line(origin={-103.982,6},
+points={{249.809,12.209},{249.809,91.9819245},{133.0222,91.9819245}},
+color={0,127,255}));
+    connect(expansionTank1.port, resistance_toExpTank.port_b) 
+    annotation(Line(origin={520.5,172},
+points={{-288,-72.4},{-288,-88},{-272,-88}}));
+    connect(world.frame_b, revolute.frame_b) 
+    annotation(Line(origin={325.5,-180.06},
+points={{-50,65.4},{-23.6,65.4},{-23.6,24.8},{-18,24.8}}));
+    connect(inertia.flange_b, revolute.axis) 
+    annotation(Line(origin={325.5,-180.06},
+points={{-18,-40},{-8,-40},{-8,14.8}}));
+    connect(damper.flange_b, fixed_ground.flange) 
+    annotation(Line(origin={367.5,-230.06},
+points={{-120,10},{-128,10},{-128,-14}},
+color={0,0,0}));
+    connect(damper.flange_a, inertia.flange_a) 
+    annotation(Line(origin={281.5,-220.06},
+points={{-14,0},{6,0}},
+color={0,0,0}));
+    connect(world.frame_b, Engine.cylinder_a) 
+    annotation(Line(origin={322,-114.86},
+points={{-46.5,0.2},{46.5,0.2}},
+color={95,95,95},
+thickness=0.5));
+    connect(revolute.frame_a, Engine.cylinder_a1) 
+    annotation(Line(origin={348,-154.86},
+points={{-20.5,-0.4},{20.5,-0.4},{20.5,-0.26}},
+color={95,95,95},
+thickness=0.5));
+    connect(realExpression2.y, Engine.T_Na) 
+    annotation(Line(origin={389,-81.86},
+points={{-6,24},{10.25,24},{10.25,-15.46}},
+color={0,0,127}));
+    connect(prescribedHeatFlow.port, Engine_pipe.wall[1]) 
+    annotation(Line(origin={348,-21.86},
+points={{-82.5,-6.14},{-82.5,4.06}},
+color={191,0,0}));
+    connect(gain.u, realExpression.y) 
+    annotation(Line(origin={202.5,-64},
+points={{18,0},{-11,0}},
+color={0,0,127}));
+    connect(gain.y, prescribedHeatFlow.Q_flow) 
+    annotation(Line(origin={316,-52.86},
+points={{-72.5,-11.14},{-50.5,-11.14},{-50.5,4.86}},
+color={0,0,127}));
+    connect(volumeTube.port_b[1], Engine_pipe.portA) 
+    annotation(Line(origin={257,-3},
+points={{-32.5,-11},{-1.47774,-10.9819}},
+color={0,127,255}));
+    connect(resistance_toExpTank.port_a, Engine_pipe.portB) 
+    annotation(Line(origin={320.5,33},
+points={{-52,51},{-40,51},{-40,25},{40.5222,25},{40.5222,-46.9819},{-44.9778,-46.9819}},
+color={0,127,255}));
+    connect(Engine_pipe.portB, pump2.port_a) 
+    annotation(Line(origin={301.5,23},
+points={{-25.9778,-36.9819},{59.5222,-36.9819},{59.5222,35},{-77,35}},
+color={0,127,255}));
+    connect(volumeTube.port_a[1], hE1_1.tube_out) 
+    annotation(Line(origin={185,8},
+    points={{27.5,-22},{7,-22},{7,22},{-26.9728,22},{-26.9728,10.209}},
     color={0,127,255}));
     connect(pump2.port_b, hE1_1.tube_in) 
-    annotation(Line(origin={144,-9},
-  points={{42,-10.9066},{-15.4962,-10.9066},{-15.4962,10.809}},
-  color={0,127,255}));
-    connect(world.frame_b, revolute.frame_b) 
-    annotation(Line(origin={374,232},
-points={{-190,-20},{-146,-20}},
-color={95,95,95},
-thickness=0.5));
-    connect(inertia.flange_b, revolute.axis) 
-    annotation(Line(origin={374,232},
-points={{-106,-72},{-103,-72},{-103,-33},{-136,-33},{-136,-30}},
-color={0,0,0}));
-    connect(world.frame_b, stirling.cylinder_a) 
-    annotation(Line(origin={374,232},
-points={{-190,-20},{-177,-20},{-177,-92},{-82.48,-92},{-82.48,-169.427}},
-color={95,95,95},
-thickness=0.5));
-    connect(revolute.frame_a, stirling.cylinder_a1) 
-    annotation(Line(origin={400,234},
-points={{-152,-22},{-79.88,-22},{-79.88,-171.427}},
-color={95,95,95},
-thickness=0.5));
-    connect(hE1_1.tube_out, stirling.hot) 
-    annotation(Line(origin={203,63},
-points={{-74.49581,-40.791},{-74.49581,-21.9697},{75.52,-21.9697}},
-color={0,127,255}));
-    connect(stirling.cold, pump2.port_a) 
-    annotation(Line(origin={241,11},
-points={{37.52,-30.9066},{-35,-30.9066}},
-color={0,127,255}));
-    connect(boundary1.ports[1], hE1_1.tube_out) 
-    annotation(Line(origin={136,53},
-points={{8,31},{-7.49581,31},{-7.49581,-30.791}},
-color={0,127,255}));
+    annotation(Line(origin={181,21},
+    points={{23.5,37},{-5,37},{-5,-37},{-22.9728,-37},{-22.9728,-23.191}},
+    color={0,127,255}));
     end SFR_Stirling;

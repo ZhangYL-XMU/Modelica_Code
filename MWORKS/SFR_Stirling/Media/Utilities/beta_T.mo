@@ -1,4 +1,4 @@
-within SFR.Media.Utilities;
+within SFR.Media.Functions;
 function beta_T
   input Modelica.Units.SI.Temperature T;
   output Modelica.Units.SI.LinearExpansionCoefficient beta;

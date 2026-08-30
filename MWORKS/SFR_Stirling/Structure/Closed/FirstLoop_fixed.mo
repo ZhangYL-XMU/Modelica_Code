@@ -1,6 +1,6 @@
 within SFR.Structure.Closed;
 model FirstLoop_fixed
-  "一回路模型（堆芯三通道+轴向三段版）：内堆芯/外堆芯/屏蔽+反射 并联，轴向入口段/活性段/出口段，图面参照 FirstLoop 布置"
+  "一回路模型（堆芯三通道+轴向三段版）"
   // ================= 设计依据（任务 SFR-20260821-01，2026-08-21） =================
   // 三通道并联（尹凯 RELAP 104/105/106）：innerCore 圈1~4 37 组件 8948.31 kW(22.37%)
   //   outerCore 圈5~8 114 组件 31051.69 kW(77.63%)；shieldReflector 屏蔽+反射合并 54 组件 Q=0
@@ -32,11 +32,26 @@ rotation=90)));
     annotation (Placement(transformation(origin={6,-126},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K"), Teffref_coolant(displayUnit="degC")=785.15) 
+  SFR.Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K"), Teffref_coolant(displayUnit="degC")=768.15 "参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
     annotation (Placement(transformation(origin={-186,-6},
 extent={{-18,-20.5},{18,20.5}})));
-  Modelica.Blocks.Continuous.LimPID PID(controllerType=Modelica.Blocks.Types.SimpleController.PID, yMax=0.021, initType=Modelica.Blocks.Types.Init.SteadyState, withFeedForward=false, k=2, wd=1) 
+  // [2026-08-29 修复] 原 LimPID 限幅用零交叉实现: PID 输出贴 ±0.021 后在浮点噪声级无限触发事件(日志 addFF.y>0.021 每秒百万次), 时间钉死在 0.0006s 卡 t=0。
+  // 修复: ①输入归一化(功率差/40e6 无量纲化, 原 k=2 直接乘 40e6 量级误差必打满限幅); ②参数重标定 k=0.5/Ti=100/Td=0;
+  //   ③限幅改用连续 Limiter(纯 min/max, 无零交叉事件), 保留物理限幅语义 ±0.021。
+  Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.SteadyState) 
+    annotation (Placement(transformation(origin={-330,8.4013},
+extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
     annotation (Placement(transformation(origin={-322,8.4013},
+extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Nonlinear.Limiter limPID(uMin=-0.021, uMax=0.021) 
+    annotation (Placement(transformation(origin={-288,8.4},
+extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Math.Gain gain_uS(k=1/40e6) "u_s 归一化(ramp W→无量纲)" 
+    annotation (Placement(transformation(origin={-348,8.4},
+extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Math.Gain gain_uM(k=1/40e6) "u_m 归一化(Q_total W→无量纲)" 
+    annotation (Placement(transformation(origin={-322,-24},
 extent={{-10,-10},{10,10}})));
   TYThermoFluidSys.Blocks.Constant const1(k=0) 
     annotation (Placement(transformation(origin={-254,30.5},
@@ -47,7 +62,7 @@ extent={{-10,-10},{10,10}})));
   TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
     annotation (Placement(transformation(origin={-370,8.4013},
 extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Sources.RealExpression realExpression1(y=TSensor2.T) 
+  Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[3] * 0.2237 + outerCore.T[3] * 0.7763) 
     annotation (Placement(transformation(origin={-254,-62.5},
 extent={{-10,-10},{10,10}})));
   TYThermoFluidSys.Blocks.Constant const2(k=823.15) 
@@ -153,13 +168,13 @@ rotation=90)));
 
   // ================= 功率分配（全局点堆 Q_total → 内外堆芯份额 → 每控制体 1/4） =================
   Modelica.Blocks.Math.Gain gain_inner(k=8948.31/40000/4) "内堆芯功率份额/4：8948.31/40000/4" 
-    annotation (Placement(transformation(origin={-133.5,-6},
+    annotation (Placement(transformation(origin={-132,-6},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Gain gain_outer(k=31051.69/40000/4) "外堆芯功率份额/4：31051.69/40000/4" 
-    annotation (Placement(transformation(origin={-53,-6},
+    annotation (Placement(transformation(origin={-48,-6},
 extent={{-10,-10},{10,10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_inner[4] 
-    annotation (Placement(transformation(origin={-100,-6},
+    annotation (Placement(transformation(origin={-98,-6},
 extent={{-6,-6},{6,6}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_outer[4] 
     annotation (Placement(transformation(origin={-21,-6},
@@ -214,38 +229,38 @@ points={{6,-120},{6,-78}},
 color={0,127,255}));
   // ---- 全局点堆 Q_total → 功率增益 ----
   connect(pointKinetics.Q_total, gain_inner.u) annotation (Line(origin={0,0},
-points={{-166,4},{-154,4},{-154,-6},{-143.5,-6}},
+points={{-165.885,8.19625},{-154,8.19625},{-154,-6},{-144,-6}},
 color={0,0,127}));
   connect(pointKinetics.Q_total, gain_outer.u) annotation (Line(origin={0,0},
-points={{-165.885,8.19625},{-162.13,8.19625},{-162.13,20},{-69,20},{-69,-6},{-65,-6}},
+points={{-165.885,8.19625},{-92,8.19625},{-92,5.02226},{-64,5.02226},{-64,-6},{-60,-6}},
 color={0,0,127}));
   // ---- 分区功率 → 活性段壁面（轴向均匀，每控制体 Q_zone/4） ----
   connect(gain_inner.y, prescribedHeatFlow_inner[1].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-97,-6},{-80.5,-6}},
+points={{-95.5,-6},{-78.5,-6}},
 color={0,0,127}));
   connect(gain_inner.y, prescribedHeatFlow_inner[2].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-97,-6},{-80.5,-6}},
+points={{-95.5,-6},{-78.5,-6}},
 color={0,0,127}));
   connect(gain_inner.y, prescribedHeatFlow_inner[3].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-97,-6},{-80.5,-6}},
+points={{-95.5,-6},{-78.5,-6}},
 color={0,0,127}));
   connect(gain_inner.y, prescribedHeatFlow_inner[4].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-97,-6},{-80.5,-6}},
+points={{-95.5,-6},{-78.5,-6}},
 color={0,0,127}));
   connect(gain_outer.y, prescribedHeatFlow_outer[1].Q_flow) annotation (Line(origin={-71,0},
-points={{29,-6},{44,-6}},
+points={{34,-6},{44,-6}},
 color={0,0,127}));
   connect(gain_outer.y, prescribedHeatFlow_outer[2].Q_flow) annotation (Line(origin={-71,0},
-points={{29,-6},{44,-6}},
+points={{34,-6},{44,-6}},
 color={0,0,127}));
   connect(gain_outer.y, prescribedHeatFlow_outer[3].Q_flow) annotation (Line(origin={-71,0},
-points={{29,-6},{44,-6}},
+points={{34,-6},{44,-6}},
 color={0,0,127}));
   connect(gain_outer.y, prescribedHeatFlow_outer[4].Q_flow) annotation (Line(origin={-71,0},
-points={{29,-6},{44,-6}},
+points={{34,-6},{44,-6}},
 color={0,0,127}));
   connect(prescribedHeatFlow_inner.port, innerCore.wall) annotation (Line(origin={-60,-8.88178e-16},
-points={{-34,-6},{-23.8,-6}},
+points={{-32,-6},{-23.8,-6}},
 color={127,0,0}));
   connect(prescribedHeatFlow_outer.port, outerCore.wall) annotation (Line(origin={-71,0},
 points={{56,-6},{73.2,-6}},
@@ -255,8 +270,11 @@ color={127,0,0}));
 points={{31,102},{31,92},{6,92},{6,76}},
 color={0,178,226}));
   // ---- 点堆控制与反馈（与 FirstLoop 相同） ----
-  connect(pointKinetics.Q_total, PID.u_m) annotation (Line(origin={-15,-5.48375},
-points={{-150.885,13.68},{-140,13.68},{-140,-38},{-307,-38},{-307,1.88505}},
+  connect(pointKinetics.Q_total, gain_uM.u) annotation (Line(origin={-15,-5.48375},
+points={{-150.885,13.68},{-147.13,13.68},{-147.13,-38},{-341,-38},{-341,-24}},
+color={0,0,127}));
+  connect(gain_uM.y, PID_error.u2) annotation (Line(origin={-320,-12},
+points={{0,-12},{0,20}},
 color={0,0,127}));
   connect(const1.y, pointKinetics.Reactivity_Other) annotation (Line(origin={-15,-5.48375},
 points={{-228,35.98375},{-200,35.98375},{-200,4.25},{-190.755,4.25}},
@@ -270,11 +288,20 @@ color={0,0,127}));
   connect(pointKinetics.Teff_fuel, const2.y) annotation (Line(origin={-15,-5.48375},
 points={{-190.755,-5.8975},{-228,-5.8975}},
 color={0,0,127}));
-  connect(ramp.y, PID.u_s) annotation (Line(origin={-15,-5.48375},
-points={{-344,13.88505},{-319,13.88505}},
+  connect(ramp.y, gain_uS.u) annotation (Line(origin={-360,10},
+points={{-10,-1.6},{0,-1.6},{0,0},{12,0}},
 color={0,0,127}));
-  connect(PID.y, pointKinetics.Reactivity_CR) annotation (Line(origin={-15,-5.48375},
-points={{-296,13.88505},{-190.755,13.885}},
+  connect(gain_uS.y, PID_error.u1) annotation (Line(origin={-330,10},
+points={{18,-1.6},{8,-1.6}},
+color={0,0,127}));
+  connect(PID_error.y, PID.u) annotation (Line(origin={-322,0},
+points={{0,-24},{0,-12}},
+color={0,0,127}));
+  connect(PID.y, limPID.u) annotation (Line(origin={-302,8},
+points={{-10,0.4},{4,0.4}},
+color={0,0,127}));
+  connect(limPID.y, pointKinetics.Reactivity_CR) annotation (Line(origin={-15,-5.48375},
+points={{-262,13.88505},{-190.755,13.885}},
 color={0,0,127}));
   // ---- 一回路其余流路（与 FirstLoop 相同） ----
   connect(volume.port_b[1], pipe_static1.portA) annotation (Line(origin={0,0},
