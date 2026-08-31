@@ -41,7 +41,7 @@ parameter SI.Temperature Teffref_coolant(displayUnit = "K") = 773.15 "冷却剂�
 
 //变量
 //SI.Power Q_total   "反应堆总功率";
-SI.Power Q_fission(start = Q_nominal) "反应堆裂变功率（点堆动力学状态变量，初值=额定功率）";
+SI.Power Q_fission(start = Q_nominal, fixed = true) "反应堆裂变功率（点堆动力学状态变量，初值=额定功率；fixed=true 防止初始化收敛到 Q=0 平凡解（2026-09-01 PrimaryLoop 温度异常根因））";
 SI.Power Q_decay   "反应堆衰变功率";
 
 Real nt(start = nt_nominal) "中子密度cm-3";

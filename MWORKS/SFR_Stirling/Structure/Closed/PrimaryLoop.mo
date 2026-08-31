@@ -15,10 +15,10 @@ rotation=90)));
     annotation (Placement(transformation(origin={4.99444,-106.991},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K"), Teffref_coolant(displayUnit="degC")=768.15 "参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
+  Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K")=864.05 "fuel ref = 864.05 K (rated mean weighted wall T; mirror coolant ref 768.15)", Teffref_coolant(displayUnit="degC")=768.15 "参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
     annotation (Placement(transformation(origin={-146,106.43},
 extent={{-18,-20.5},{18,20.5}})));
-  Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.SteadyState) 
+  Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.NoInit) 
     annotation (Placement(transformation(origin={-290,120.831},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
@@ -33,19 +33,19 @@ extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Gain gain_uM(k=1/40e6) "u_m 归一化(Q_total W→无量纲)" 
     annotation (Placement(transformation(origin={-364,90.9009},
 extent={{-10,-10},{10,10}})));
-  TYThermoFluidSys.Blocks.Constant const1(k=0) 
+  Modelica.Blocks.Sources.Constant const1(k=0) 
     annotation (Placement(transformation(origin={-214,142.93},
 extent={{-10,-10},{10,10}})));
-  TYThermoFluidSys.Blocks.Constant const3(k=0) 
+  Modelica.Blocks.Sources.Constant const3(k=0) 
     annotation (Placement(transformation(origin={-180,170.93},
 extent={{-10,-10},{10,10}})));
-  TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=0, duration=100, startTime=400) 
+  Modelica.Blocks.Sources.Constant ramp(k=40e6) "参考功率 40MW（恒定；原 TY Ramp(offset=40e6,height=0) 语义等价——MSL Ramp 在 Sysplorer 下 time<startTime 时输出 0，曾导致参考信号归零、CR 满插压堆，2026-09-01 修复）" 
     annotation (Placement(transformation(origin={-420,120.83},
 extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[3] * 0.2237 + outerCore.T[3] * 0.7763) 
+  Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[6] * 0.2237 + outerCore.T[6] * 0.7763 "coolant eff. T at axial mid (mirror Teffref=768.15K)") 
     annotation (Placement(transformation(origin={-184,90.9009},
 extent={{-10,-10},{10,10}})));
-  TYThermoFluidSys.Blocks.Constant const2(k=823.15) 
+  Modelica.Blocks.Sources.RealExpression realExpression4(y=tubeWall.T[6] * 0.2237 + tubeWall1.T[6] * 0.7763 "fuel eff. T from TubeWall states (mirror coolant input; wall temp as fuel lump)") 
     annotation (Placement(transformation(origin={-214,101.048},
 extent={{-10,-10},{10,10}})));
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
@@ -141,16 +141,16 @@ extent={{-6,-6},{6,6}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_outer[10] 
     annotation (Placement(transformation(origin={-42,13.009},
 extent={{-6,-6},{6,6}})));
-  Thermal.Volumes.TubeWall tubeWall(N=10, n_tubes=37, r_inner=0.0028, r_outer=0.003, length=1.1, T_start=823.15 "壁温初值550℃") 
+  Thermal.Volumes.TubeWall tubeWall(N=10, n_tubes=37, r_inner=0.0028, r_outer=0.003, length=1.1, T_start=823.15 "wall init 550C") 
     annotation (Placement(transformation(origin={-113.0056,13.009},
 extent={{10,-10},{-10,10}})));
-  Thermal.Volumes.TubeWall tubeWall1(N=10, n_tubes=114, r_inner=0.0028, r_outer=0.003, length=1.1, T_start=823.15 "壁温初值550℃") 
+  Thermal.Volumes.TubeWall tubeWall1(N=10, n_tubes=114, r_inner=0.0028, r_outer=0.003, length=1.1, T_start=823.15 "wall init 550C") 
     annotation (Placement(transformation(origin={-16,13.009},
 extent={{10,-10},{-10,10}})));
-  Modelica.Blocks.Sources.RealExpression realExpression2[10] (y=pointKinetics.Q_innerCore / 10) 
+  Modelica.Blocks.Sources.RealExpression realExpression2[10] (y=pointKinetics.Q_total * 0.2237 / 10 "inner 22.37% (2026-09-01 cal)") 
     annotation (Placement(transformation(origin={-166,13.009},
 extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Sources.RealExpression realExpression3[10] (y=pointKinetics.Q_outerCore / 10) 
+  Modelica.Blocks.Sources.RealExpression realExpression3[10] (y=pointKinetics.Q_total * 0.7763 / 10 "outer 77.63% (2026-09-01 cal)") 
     annotation (Placement(transformation(origin={-46,44},
 extent={{-10,-10},{10,10}})));
   equation
@@ -208,7 +208,7 @@ extent={{-10,-10},{10,10}})));
   color={0,127,255}));
   connect(pointKinetics.Q_total, gain_uM.u) 
   annotation(Line(origin={25.0004,106.946},
-points={{-150.8854,13.68},{-147.13,13.68},{-147.13,-32.045},{-405,-32.045},{-405,-16.045},{-401,-16.045}},
+points={{-150.8854,13.6803},{-147.1304,13.6803},{-147.1304,-56.946},{-405.0004,-56.946},{-405.0004,-16.0451},{-401.0004,-16.0451}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(gain_uM.y, PID_error.u2) 
   annotation(Line(origin={-280,100.43},
@@ -226,7 +226,7 @@ color={0,0,127}));
   annotation(Line(origin={25.0004,106.946},
 points={{-194.0004,63.98375},{-171.3154,63.98375},{-171.3154,22.085}},
 color={0,0,127}));
-  connect(pointKinetics.Teff_fuel, const2.y) 
+  connect(realExpression4.y, pointKinetics.Teff_fuel) 
   annotation(Line(origin={25.0004,106.946},
 points={{-190.7554,-5.8975},{-228.0004,-5.89755}},
 color={0,0,127}));
