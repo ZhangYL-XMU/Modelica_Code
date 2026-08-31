@@ -59,7 +59,7 @@ extent={{-10,-10},{10,10}})));
   TYThermoFluidSys.Blocks.Constant const3(k=0) 
     annotation (Placement(transformation(origin={-220,58.5},
 extent={{-10,-10},{10,10}})));
-  TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=100, startTime=400) 
+  TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=0, duration=100, startTime=400) 
     annotation (Placement(transformation(origin={-460,8.4},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[3] * 0.2237 + outerCore.T[3] * 0.7763) 
@@ -77,7 +77,7 @@ extent={{-10,-10},{10,10}})));
   SFR.Fluid.Vessels.SpecifiedResistance resistance_toBoundary(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
     annotation (Placement(transformation(origin={172,118},
 extent={{-10,-10},{10,10}})));
-  SFR.Thermal.HeatExchange.HE1 hE1_1(shell(momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState)) 
+  SFR.Thermal.HeatExchange.HE1 hE1_1(shell(momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState),N=10) 
     annotation (Placement(transformation(origin={256.01113,2.009},
     extent={{10,10},{-10,-10}},
     rotation=90)));
@@ -153,32 +153,32 @@ extent={{-10,-10},{10,10}},
 rotation=90)));
 
   // ================= 流量分配阻力（三路独立，R=1000/m_target） =================
-  SFR.Fluid.Vessels.SpecifiedResistance resistance_shield(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=6280 "屏蔽+反射等温流道 0.5 kg/s(R迭代: 2000*1.57/0.5)") 
+  SFR.Fluid.Vessels.SpecifiedResistance resistance_shield(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=6400 "屏蔽+反射等温流道 0.5 kg/s(2026-08-31新HE1重配流: 0.44@7280→0.5@6400, m=3200/R)") 
     annotation (Placement(transformation(origin={78,-68},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Vessels.SpecifiedResistance resistance_outer(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=4.30 "外堆芯 217.4 kg/s(R迭代2: 4.48*(213.6/217.4)收紧)") 
+  SFR.Fluid.Vessels.SpecifiedResistance resistance_outer(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=4.20 "外堆芯 217.4 kg/s(2026-08-31新HE1重配流)") 
     annotation (Placement(transformation(origin={6,-68},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  SFR.Fluid.Vessels.SpecifiedResistance resistance_inner(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=20.6 "内堆芯 62.7 kg/s(R迭代3: 20.0*(64.3/62.7)收紧→出口550)") 
+  SFR.Fluid.Vessels.SpecifiedResistance resistance_inner(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=22.1 "内堆芯 62.7 kg/s(2026-08-31新HE1重配流: 63.9→64.5→收紧)") 
     annotation (Placement(transformation(origin={-79.9819,-68},
 extent={{-10,-10},{10,10}},
 rotation=90)));
 
   // ================= 功率分配（全局点堆 Q_total → 内外堆芯份额 → 每控制体 1/4） =================
-  Modelica.Blocks.Math.Gain gain_inner(k=8948.31/40000/4) "内堆芯功率份额/4：8948.31/40000/4" 
-    annotation (Placement(transformation(origin={-132,-6},
-extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Math.Gain gain_outer(k=31051.69/40000/4) "外堆芯功率份额/4：31051.69/40000/4" 
-    annotation (Placement(transformation(origin={-48,-6},
-extent={{-10,-10},{10,10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_inner[4] 
     annotation (Placement(transformation(origin={-98,-6},
 extent={{-6,-6},{6,6}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_outer[4] 
     annotation (Placement(transformation(origin={-21,-6},
 extent={{-6,-6},{6,6}})));
+  Modelica.Blocks.Sources.RealExpression realExpression2[4] (y=pointKinetics.Q_innerCore / 4) 
+    annotation (Placement(transformation(origin={-128,-6},
+extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Sources.RealExpression realExpression3[4] (y=pointKinetics.Q_outerCore / 4) 
+    annotation (Placement(transformation(origin={-48,-6},
+extent={{-10,-10},{10,10}})));
 
 equation
   // ---- 堆芯出口 → 上腔室 volume（port_a[1]=内堆芯, [2]=外堆芯, [3]=屏蔽+反射） ----
@@ -228,37 +228,7 @@ color={0,127,255}));
 points={{6,-120},{6,-78}},
 color={0,127,255}));
   // ---- 全局点堆 Q_total → 功率增益 ----
-  connect(pointKinetics.Q_total, gain_inner.u) annotation (Line(origin={0,0},
-points={{-165.885,8.19625},{-154,8.19625},{-154,-6},{-144,-6}},
-color={0,0,127}));
-  connect(pointKinetics.Q_total, gain_outer.u) annotation (Line(origin={0,0},
-points={{-165.885,8.19625},{-92,8.19625},{-92,5.02226},{-64,5.02226},{-64,-6},{-60,-6}},
-color={0,0,127}));
   // ---- 分区功率 → 活性段壁面（轴向均匀，每控制体 Q_zone/4） ----
-  connect(gain_inner.y, prescribedHeatFlow_inner[1].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-95.5,-6},{-78.5,-6}},
-color={0,0,127}));
-  connect(gain_inner.y, prescribedHeatFlow_inner[2].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-95.5,-6},{-78.5,-6}},
-color={0,0,127}));
-  connect(gain_inner.y, prescribedHeatFlow_inner[3].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-95.5,-6},{-78.5,-6}},
-color={0,0,127}));
-  connect(gain_inner.y, prescribedHeatFlow_inner[4].Q_flow) annotation (Line(origin={-25.5,0},
-points={{-95.5,-6},{-78.5,-6}},
-color={0,0,127}));
-  connect(gain_outer.y, prescribedHeatFlow_outer[1].Q_flow) annotation (Line(origin={-71,0},
-points={{34,-6},{44,-6}},
-color={0,0,127}));
-  connect(gain_outer.y, prescribedHeatFlow_outer[2].Q_flow) annotation (Line(origin={-71,0},
-points={{34,-6},{44,-6}},
-color={0,0,127}));
-  connect(gain_outer.y, prescribedHeatFlow_outer[3].Q_flow) annotation (Line(origin={-71,0},
-points={{34,-6},{44,-6}},
-color={0,0,127}));
-  connect(gain_outer.y, prescribedHeatFlow_outer[4].Q_flow) annotation (Line(origin={-71,0},
-points={{34,-6},{44,-6}},
-color={0,0,127}));
   connect(prescribedHeatFlow_inner.port, innerCore.wall) annotation (Line(origin={-60,-8.88178e-16},
 points={{-32,-6},{-23.8,-6}},
 color={127,0,0}));
@@ -331,5 +301,14 @@ color={0,127,255}));
   connect(boundary2.ports[1], hE1_1.tube_out) annotation (Line(origin={0,0},
 points={{316,44},{262.00932,44},{262.00932,12.209}},
 color={0,127,255}));
-  annotation (experiment(Algorithm=Dassl, StartTime=0, StopTime=3600, Interval=0.01, Tolerance=0.0001), Diagram(coordinateSystem(extent={{-100,-100},{100,100}}, grid={2,2})));
+  annotation (experiment(Algorithm=Dassl, StartTime=0, StopTime=3600, Interval=0.01, Tolerance=0.0001), Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
+grid={2,2})));
+  connect(prescribedHeatFlow_inner.Q_flow, realExpression2.y) 
+  annotation(Line(origin={-110,-6},
+  points={{6,0},{-7,0}},
+  color={0,0,127}));
+  connect(prescribedHeatFlow_outer.Q_flow, realExpression3.y) 
+  annotation(Line(origin={-32,-6},
+  points={{5,0},{-5,8.88178e-16}},
+  color={0,0,127}));
 end FirstLoop_fixed;

@@ -1,5 +1,5 @@
 within SFR.Fluid.Pipes.BaseClasses.HeatTransfer;
-partial model circle
+model circle
   import Modelica.Constants;
   replaceable package Medium = Modelica.Media.Water.StandardWater;
 
@@ -16,7 +16,7 @@ input Modelica.Units.SI.Area[Nw] A;
   //输入变量
 
 input Medium.ThermodynamicState[Nf] states "热力状态(ph)";
-  input Real CF = 1.0 "换热能力修正系数";
+input Real CF = 1.0 "换热能力修正系数";
 input Medium.MassFlowRate m_flow[Nw] "质量流";
 
   //热力学参数

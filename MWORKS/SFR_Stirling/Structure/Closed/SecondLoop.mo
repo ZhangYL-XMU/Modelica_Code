@@ -34,11 +34,11 @@ extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Sources.Boundary_pT boundary(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, T=713.15, p=100000.0) 
     annotation(Placement(transformation(origin={-106,96},
 extent={{-10,-10},{10,10}})));
-  Modelica.Mechanics.Rotational.Components.Damper damper(d=15) annotation(Placement(transformation(origin={63,-170.06},
+  Modelica.Mechanics.Rotational.Components.Damper damper(d=10.6) "发电负载（转速校准→1500rpm）发电负载 250kW@1500rpm 等效" annotation(Placement(transformation(origin={63,-170.06},
 extent={{10,-10},{-10,10}})));
   Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={45,-194.06},
 extent={{-10,-10},{10,10}})));
-  Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=100, fixed=true)) 
+  Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=0, fixed=true,displayUnit="rpm") "1500rpm 初值") 
     annotation(Placement(transformation(origin={103,-170.06},
 extent={{-10,-10},{10,10}})));
   inner Modelica.Mechanics.MultiBody.World world 
@@ -47,7 +47,7 @@ extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
         displayUnit="1") = {1,0,0}) annotation(Placement(transformation(origin={123,-105.26},
 extent={{10,10},{-10,-10}})));
-  Stirling.DoubleActing.DA_Engine_v2 Engine 
+  Stirling.DoubleActing.DA_Engine_v2 Engine(heff=1.41) 
     annotation (Placement(transformation(origin={204.75,-82},
 extent={{-30.75,-28.9},{30.75,28.9}})));
   Fluid.Pipes.pipe Engine_pipe(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium,N=5,L_total=5,m_flow_start=100) 
@@ -57,18 +57,16 @@ extent={{-10,10},{10,-10}})));
     annotation (Placement(transformation(origin={71,12},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  Modelica.Blocks.Sources.RealExpression realExpression(y=- Engine.y * 4 * 10) 
-    annotation (Placement(transformation(origin={-14,-14},
+  Modelica.Blocks.Sources.RealExpression realExpression(y= - Engine.Q) "引擎吸热=40×Q_in×heff（heff 在 DA_Engine_v2 内，标定后 Q_in≈725kW → 40.6MW）" 
+    annotation (Placement(transformation(origin={37.75,-14},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression1(y=Engine_pipe.T[1]) 
     annotation (Placement(transformation(origin={177.5,-7.86},
 extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Math.Gain gain(k=1) 
-    annotation (Placement(transformation(origin={38,-14},
-extent={{-10,-10},{10,10}})));
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
     annotation (Placement(transformation(origin={20,108},
 extent={{10,-10},{-10,10}})));
+
   // ========== 引擎+机械部分：与 SFR.Stirling.DoubleActing.Test_Engine 逐字同构（含 Placement） ==========
   equation
   // ---------- 主回路（泵→HE1管侧→引擎热端→引擎→冷端→泵） ----------
@@ -115,14 +113,6 @@ color={0,0,127}));
   annotation(Line(origin={153.5,28.14},
 points={{-82.5,-6.14},{-82.5,4.06}},
 color={191,0,0}));
-  connect(gain.u, realExpression.y) 
-  annotation(Line(origin={8,-14},
-points={{18,0},{-11,0}},
-color={0,0,127}));
-  connect(gain.y, prescribedHeatFlow.Q_flow) 
-  annotation(Line(origin={121.5,-2.86},
-points={{-72.5,-11.14},{-50.5,-11.14},{-50.5,4.86}},
-color={0,0,127}));
   connect(hE1_1.tube_out, volumeTube.port_a[1]) 
   annotation(Line(origin={4,52.4},
 points={{-40.00181,-5.6},{-40.00181,-16.4},{14,-16.4}},
@@ -143,5 +133,9 @@ color={0,127,255}));
   annotation(Line(origin={-4,88},
 points={{14,20},{-32.00181,20},{-32.00181,-20.8}},
 color={0,127,255}));
+  connect(realExpression.y, prescribedHeatFlow.Q_flow) 
+  annotation(Line(origin={34,-6},
+points={{14.75,-8},{37,-8},{37,8}},
+color={0,0,127}));
   // ---------- 机械侧（同 Test_Engine） ----------
   end SecondLoop;

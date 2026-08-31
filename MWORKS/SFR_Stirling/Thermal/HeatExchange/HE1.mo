@@ -1,8 +1,6 @@
 within SFR.Thermal.HeatExchange;
 model HE1
-  "中间热交换器 IHX：一次侧（壳程，SFR 钠）放热 550→440 ℃ @280.6 kg/s；二次侧（管程，SFR 钠）吸热 430→530 ℃ @308.4 kg/s"
-  "几何/换热参数已提升到顶层（图形层双击本组件可编辑）：n_tubes/L_total/管径壁厚/CF_HeatTransfer/N 等"
-  "壳/管侧动量均为 SteadyState：壳侧接锁流量泵、管侧接锁流量源+定压边界，动态动量无必要且易压力奇异"
+  "中间热交换器 IHX：一次侧（壳程，SFR 钠）放热 550→440 ℃ @280.6 kg/s；二次侧（管程，SFR 钠）吸热 430→530 ℃ @308.4 kg/s几何/换热参数已提升到顶层（图形层双击本组件可编辑）：n_tubes/L_total/管径壁厚/CF_HeatTransfer/N 等壳/管侧动量均为 SteadyState：壳侧接锁流量泵、管侧接锁流量源+定压边界，动态动量无必要且易压力奇异。2026-08-31 几何修正：n_tubes=1440（4 台×360 根合并）、壳侧当量直径按外套筒内径 450 mm 推导（0.0178 m）、CF_HeatTransfer=1.086 标定，见 建模文档/换热器HE1标定_20260831.md"
   annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=100,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=100,StoreEventValue=0,Tolerance=0.0001),Icon(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2}),graphics = {Rectangle(origin={0,0},
@@ -24,14 +22,15 @@ extent={{73,6},{-73,-6}}), Line(origin={-40,0},
 points={{20,40},{-20,30},{20,20},{-20,10},{20,0},{-20,-10},{20,-20},{-20,-30},{20,-40}}), Line(origin={40,0},
 points={{20,40},{-20,30},{20,20},{-20,10},{20,0},{-20,-10},{20,-20},{-20,-30},{20,-40}})}));
   // ===== 顶层参数（图形层可编辑；默认值 = 已验证的标定状态） =====
-  parameter Integer n_tubes = 360 "换热管根数（4 台 IHX 合并等效）" annotation(Dialog(group="几何"));
+  parameter Integer n_tubes = 1440 "换热管根数（4 台 IHX 合并等效：4×360=1440）" annotation(Dialog(group="几何"));
   parameter Modelica.Units.SI.Length L_total = 2 "换热管/壳程长度 [m]" annotation(Dialog(group="几何"));
-  parameter Modelica.Units.SI.Length Dh_tube = 0.0136 "管侧水力直径（管内径）[m]" annotation(Dialog(group="几何"));
-  parameter Modelica.Units.SI.Length Dh_shell = 0.016 "壳侧当量直径 [m]" annotation(Dialog(group="几何"));
-  parameter Modelica.Units.SI.Length r_wall_in = 0.0136 "管壁内半径 [m]（课题口径：与管内径同值，勿改）" annotation(Dialog(group="几何"));
-  parameter Modelica.Units.SI.Length r_wall_out = 0.016 "管壁外半径 [m]（课题口径：与管外径同值，勿改）" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length Dh_tube = 0.0136 "管侧水力直径（管内径=φ16−2×1.2=13.6 mm）[m]" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length Dh_shell = 0.0178 "壳侧当量直径 [m]（由外套筒内径450mm+360xφ16推导：A_free=0.0867 m2,P=19.51 m,Dh=4A/P）" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length D_shell_in = 0.45 "外套筒内径（侯斌表4：450 mm）[m]" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length r_wall_in = 0.0136 "管壁内径 [m]（TY TubeWall r_inner 为内径口径：φ16×1.2 → 13.6 mm）" annotation(Dialog(group="几何"));
+  parameter Modelica.Units.SI.Length r_wall_out = 0.016 "管壁外径 [m]（TY TubeWall r_outer 为外径口径：16 mm）" annotation(Dialog(group="几何"));
   parameter Integer N = 5 "每侧节点数" annotation(Dialog(group="网格"));
-  parameter Real CF_HeatTransfer = 2.5 "换热能力修正系数（标定：4 台 IHX 合并等效；增大=换热更强）" annotation(Dialog(tab="换热标定"));
+  parameter Real CF_HeatTransfer = 1.086 "换热能力修正系数（标定 2026-08-31：n_tubes=1440 四台合并；设计 UA≈2.77 MW/K ↔ 模型 Lyon 2.55 MW/K；增大=换热更强）" annotation(Dialog(tab="换热标定"));
   parameter Modelica.Units.SI.Temperature T_wall_ref = 713.15 "管壁参考温度 [K]（440℃）" annotation(Dialog(tab="初始化"));
   parameter Modelica.Units.SI.Temperature T_wall_init = 738.15 "管壁初始温度 [K]（465℃）" annotation(Dialog(tab="初始化"));
   TYThermoFluidSys.Thermal.TubeWall tubeWall(N=N - 1,

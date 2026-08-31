@@ -53,10 +53,13 @@ extent={{-16,-16},{16,16}})));
     annotation (Placement(transformation(origin={0,120},
 extent={{-20,-20},{20,20}},
 rotation=-90)));
-  Modelica.Blocks.Interfaces.RealOutput y 
+  Modelica.Blocks.Interfaces.RealOutput Q "简化后总的斯特林吸热量" 
     annotation (Placement(transformation(origin={0,-110},
 extent={{-10,-10},{10,10}},
 rotation=-90)));
+  Modelica.Blocks.Math.Gain gain(k=4 * 10 * heff) 
+    annotation (Placement(transformation(origin={68,-86},
+extent={{10,-10},{-10,10}})));
   equation
   power = dA_Gas_Dynamic_Tian.power;
 
@@ -144,8 +147,12 @@ thickness=0.5),__MWORKS(BlockSystem(NamedSignal)));
   annotation(Line(origin={50,55},
   points={{-50,65},{50,65},{50,-65}},
   color={0,0,127}));
-  connect(dA_Gas_Dynamic_Tian.Q_in, y) 
-  annotation(Line(origin={50,-72},
-  points={{50,38},{50,-14},{-50,-14},{-50,-38}},
+  connect(dA_Gas_Dynamic_Tian.Q_in, gain.u) 
+  annotation(Line(origin={90,-60},
+  points={{10,26},{10,-26},{-10,-26}},
   color={0,0,127}));
+  connect(gain.y, Q) 
+  annotation(Line(origin={29,-98},
+points={{28,12},{-29,12},{-29,-12}},
+color={0,0,127}));
   end DA_Engine_v2;

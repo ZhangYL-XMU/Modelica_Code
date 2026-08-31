@@ -46,7 +46,10 @@ model pipe
 
 //传热模型    
   replaceable model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.circle
-     "换热模型" annotation(choicesAllMatching, Dialog(group = "壁面传热", enable = wallHeatTransfer), Protection(access = Access.packageDuplicate));
+     "换热模型" annotation(choices(
+        choice(redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.circle "圆管换热"),
+        choice(redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.core "棒束换热")),
+        Dialog(group = "壁面传热", enable = wallHeatTransfer), Protection(access = Access.packageDuplicate));
   HeatTransfer heatTransfer(
   redeclare package Medium = Medium,
     states = states,
