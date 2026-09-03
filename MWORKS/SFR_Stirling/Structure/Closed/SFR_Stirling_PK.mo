@@ -1,6 +1,5 @@
 within SFR.Structure.Closed;
 model SFR_Stirling_PK
-  "总装验证：标定版 PrimaryLoop（点堆+管壁+燃料/冷却剂反馈）+ 二回路斯特林（HE1 二次侧接二回路，替代边界）"
   // 2026-09-01 总装验证模型。一回路 = PrimaryLoop 标定版（份额 22.37/77.63、TubeWall、realExpression1/4 反馈、
   //   Teffref_fuel=864.05/Teffref_coolant=768.15、R=22.1/4.2/6400、HE1 N=10、Constant 40MW 参考）；
   // 二回路/引擎 = SFR_Stirling 定案版（pump2 308.4、Engine_pipe、DA_Engine_v2 Engine(heff=1.41)、
@@ -156,45 +155,53 @@ model SFR_Stirling_PK
     extent={{-10,-10},{10,10}})));
   // ================= 二回路 + 引擎（SFR_Stirling 定案版，坐标整体右移 550） =================
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-    annotation (Placement(transformation(origin={764.5,58},
-    extent={{10,-10},{-10,10}})));
+    annotation (Placement(transformation(origin={344.25,58.9},
+extent={{10,-10},{-10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression_TNa(y=Engine_pipe.T[1]) "引擎钠侧输入温度" 
-    annotation (Placement(transformation(origin={842,-64.76},
-    extent={{-10,-10},{10,10}})));
+    annotation (Placement(transformation(origin={421.75,-63.86},
+extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression_QEngine(y=- Engine.Q) "引擎吸热=40×Q_in×heff（同步 SecondLoop 标定）" 
-    annotation (Placement(transformation(origin={790,-64.76},
-    extent={{-10,-10},{10,10}})));
+    annotation (Placement(transformation(origin={369.75,-63.86},
+extent={{-10,-10},{10,10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow engineHeatFlow 
-    annotation (Placement(transformation(origin={815.5,-38},
-    extent={{-10,-10},{10,10}},
-    rotation=90)));
+    annotation (Placement(transformation(origin={395.25,-37.1},
+extent={{-10,-10},{10,10}},
+rotation=90)));
   Fluid.Pipes.pipe Engine_pipe(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium,N=5,L_total=5,h_start=589680 "引擎入口~480℃剖面初值",m_flow_start=100) 
-    annotation (Placement(transformation(origin={815.5,-14},
-    extent={{-10,10},{10,-10}})));
+    annotation (Placement(transformation(origin={395.25,-13.1},
+extent={{-10,10},{10,-10}})));
   Stirling.DoubleActing.DA_Engine_v2 Engine(heff=1.41) 
-    annotation (Placement(transformation(origin={867,-138.9},
-    extent={{-30.75,-28.9},{30.75,28.9}})));
+    annotation (Placement(transformation(origin={446.75,-138},
+extent={{-30.75,-28.9},{30.75,28.9}})));
   Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(displayUnit="1") = {1,0,0}) 
-    annotation(Placement(transformation(origin={794.25,-162.16}, extent={{10,10},{-10,-10}})));
+    annotation(Placement(transformation(origin={374,-161.26},
+extent={{10,10},{-10,-10}})));
   inner Modelica.Mechanics.MultiBody.World world 
-    annotation(Placement(transformation(origin={742.25,-121.56}, extent={{-10,-10},{10,10}})));
+    annotation(Placement(transformation(origin={322,-120.66},
+extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=0, fixed=true) "初值0（同 SecondLoop；稳态自然转向负向）") 
-    annotation(Placement(transformation(origin={774,-212}, extent={{-10,-10},{10,10}})));
+    annotation(Placement(transformation(origin={353.75,-211.1},
+extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Fixed fixed_ground 
-    annotation(Placement(transformation(origin={684.029,-236}, extent={{-10,-10},{10,10}})));
+    annotation(Placement(transformation(origin={263.779,-235.1},
+extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Damper damper(d=10.6) "发电负载（同步 SecondLoop：转速→1500rpm）" 
-    annotation(Placement(transformation(origin={702.029,-212}, extent={{10,-10},{-10,10}})));
+    annotation(Placement(transformation(origin={281.779,-211.1},
+extent={{10,-10},{-10,10}})));
   Fluid.Vessels.SpecifiedResistance resistance_toExpTank(
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
-    annotation(Placement(transformation(origin={808.5,84}, extent={{10,-10},{-10,10}})));
+    annotation(Placement(transformation(origin={388.25,84.9},
+extent={{10,-10},{-10,10}})));
   Fluid.Vessels.ExpansionTank expansionTank1(
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     A=1, V0=0.001, level_start=1, h_start=506655, p_start=100000.0) 
-    annotation(Placement(transformation(origin={782.5,108}, extent={{-10,-10},{10,10}})));
+    annotation(Placement(transformation(origin={362.25,108.9},
+extent={{-10,-10},{10,10}})));
   Fluid.Vessels.MixingVolume volumeTube(
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     nPorts_a=1, nPorts_b=1, V=1, h_start=654480 "HE1出口530℃(设计剖面初值)") 
-    annotation(Placement(transformation(origin={768.5,-14}, extent={{-10,-10},{10,10}})));
+    annotation(Placement(transformation(origin={348.25,-13.1},
+extent={{-10,-10},{10,10}})));
   equation
   // ---- 堆芯三通道 → 上腔室 ----
   connect(innerCore_out.portB, volume.port_a[1]) 
@@ -350,62 +357,62 @@ model SFR_Stirling_PK
     color={0,0,127}));
   // ---- 二回路（HE1 二次侧 → 引擎 → 泵 → HE1） ----
   connect(expansionTank1.port, resistance_toExpTank.port_b) 
-    annotation(Line(origin={1070.5,172},
-    points={{-288,-72.4},{-288,-88},{-272,-88}}));
+    annotation(Line(origin={650.25,172.9},
+points={{-288,-72.4},{-288,-88},{-272,-88}}));
   connect(world.frame_b, revolute.frame_b) 
-    annotation(Line(origin={802.25,-186.96},
-    points={{-50,65.4},{-23.6,65.4},{-23.6,24.8},{-18,24.8}}));
+    annotation(Line(origin={382,-186.06},
+points={{-50,65.4},{-23.6,65.4},{-23.6,24.8},{-18,24.8}}));
   connect(inertia.flange_b, revolute.axis) 
-    annotation(Line(origin={802.25,-186.96},
-    points={{-18.25,-25.04},{-8,-25.04},{-8,14.8}}));
+    annotation(Line(origin={382,-186.06},
+points={{-18.25,-25.04},{-8,-25.04},{-8,14.8}}));
   connect(damper.flange_b, fixed_ground.flange) 
-    annotation(Line(origin={812.029,-222},
-    points={{-120,10},{-128,10},{-128,-14}},
-    color={0,0,0}));
+    annotation(Line(origin={391.779,-221.1},
+points={{-120,10},{-128,10},{-128,-14}},
+color={0,0,0}));
   connect(damper.flange_a, inertia.flange_a) 
-    annotation(Line(origin={758.25,-226.96},
-    points={{-46.221,14.96},{5.75,14.96}},
-    color={0,0,0}));
+    annotation(Line(origin={338,-226.06},
+points={{-46.221,14.96},{5.75,14.96}},
+color={0,0,0}));
   connect(world.frame_b, Engine.cylinder_a) 
-    annotation(Line(origin={798.75,-121.76},
-    points={{-46.5,0.2},{37.5,0.2}},
-    color={95,95,95},
-    thickness=0.5));
+    annotation(Line(origin={378.5,-120.86},
+points={{-46.5,0.2},{37.5,0.2}},
+color={95,95,95},
+thickness=0.5));
   connect(revolute.frame_a, Engine.cylinder_a1) 
-    annotation(Line(origin={824.75,-161.76},
-    points={{-20.5,-0.4},{11.5,-0.4},{11.5,-0.26}},
-    color={95,95,95},
-    thickness=0.5));
+    annotation(Line(origin={404.5,-160.86},
+points={{-20.5,-0.4},{11.5,-0.4},{11.5,-0.26}},
+color={95,95,95},
+thickness=0.5));
   connect(realExpression_TNa.y, Engine.T_Na) 
-    annotation(Line(origin={865.75,-88.76},
-    points={{-12.75,24},{1.25,24},{1.25,-15.46}},
-    color={0,0,127}));
+    annotation(Line(origin={445.5,-87.86},
+points={{-12.75,24},{1.25,24},{1.25,-15.46}},
+color={0,0,127}));
   connect(engineHeatFlow.port, Engine_pipe.wall[1]) 
-    annotation(Line(origin={898,-21.86},
-    points={{-82.5,-6.14},{-82.5,4.06}},
-    color={191,0,0}));
+    annotation(Line(origin={477.75,-20.96},
+points={{-82.5,-6.14},{-82.5,4.06}},
+color={191,0,0}));
   connect(volumeTube.port_b[1], Engine_pipe.portA) 
-    annotation(Line(origin={807,-3},
-    points={{-32.5,-11},{-1.47774,-10.9819}},
-    color={0,127,255}));
+    annotation(Line(origin={386.75,-2.1},
+points={{-32.5,-11},{-1.47774,-10.9819}},
+color={0,127,255}));
   connect(resistance_toExpTank.port_a, Engine_pipe.portB) 
-    annotation(Line(origin={870.5,33},
-    points={{-52,51},{-40,51},{-40,25},{40.5222,25},{40.5222,-46.9819},{-44.9778,-46.9819}},
-    color={0,127,255}));
+    annotation(Line(origin={450.25,33.9},
+points={{-52,51},{-40,51},{-40,25},{40.5222,25},{40.5222,-46.9819},{-44.9778,-46.9819}},
+color={0,127,255}));
   connect(Engine_pipe.portB, pump2.port_a) 
-    annotation(Line(origin={851.5,23},
-    points={{-25.9778,-36.9819},{59.5222,-36.9819},{59.5222,35},{-77,35}},
-    color={0,127,255}));
+    annotation(Line(origin={431.25,23.9},
+points={{-25.9778,-36.9819},{59.5222,-36.9819},{59.5222,35},{-77,35}},
+color={0,127,255}));
   connect(volumeTube.port_a[1], hE1_1.tube_out) 
-    annotation(Line(origin={735,8},
-    points={{27.5,-22},{7,-22},{7,22},{-26.9728,22},{-26.9728,10.209}},
-    color={0,127,255}));
+    annotation(Line(origin={314.75,8.9},
+points={{27.5,-22},{7,-22},{7,22.318},{-53.7462,22.318}},
+color={0,127,255}));
   connect(pump2.port_b, hE1_1.tube_in) 
-    annotation(Line(origin={731,21},
-    points={{23.5,37},{-5,37},{-5,-37},{-22.9728,-37},{-22.9728,-23.191}},
-    color={0,127,255}));
+    annotation(Line(origin={310.75,21.9},
+points={{23.5,37},{-5,37},{-5,-37},{-22.9728,-37},{-22.9728,-11.082},{-49.7462,-11.082}},
+color={0,127,255}));
   connect(realExpression_QEngine.y, engineHeatFlow.Q_flow) 
-    annotation(Line(origin={779,-56},
-    points={{22,-8.76},{36.5,-8.76},{36.5,8}},
-    color={0,0,127}));
+    annotation(Line(origin={358.75,-55.1},
+points={{22,-8.76},{36.5,-8.76},{36.5,8}},
+color={0,0,127}));
 end SFR_Stirling_PK;

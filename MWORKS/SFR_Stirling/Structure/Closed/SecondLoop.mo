@@ -34,21 +34,21 @@ extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Sources.Boundary_pT boundary(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, T=713.15, p=100000.0) 
     annotation(Placement(transformation(origin={-106,96},
 extent={{-10,-10},{10,10}})));
-  Modelica.Mechanics.Rotational.Components.Damper damper(d=10.6) "发电负载（转速校准→1500rpm）发电负载 250kW@1500rpm 等效" annotation(Placement(transformation(origin={63,-170.06},
+  Modelica.Mechanics.Rotational.Components.Damper damper(d=10.6) "发电负载（转速校准→1500rpm）发电负载 250kW@1500rpm 等效" annotation(Placement(transformation(origin={131,-168.06},
 extent={{10,-10},{-10,10}})));
-  Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={45,-194.06},
+  Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={113,-192.06},
 extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=0, fixed=true,displayUnit="rpm") "1500rpm 初值") 
-    annotation(Placement(transformation(origin={103,-170.06},
+    annotation(Placement(transformation(origin={163,-168.06},
 extent={{-10,-10},{10,10}})));
   inner Modelica.Mechanics.MultiBody.World world 
-    annotation(Placement(transformation(origin={71,-64.66},
+    annotation(Placement(transformation(origin={131,-62.66},
 extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
-        displayUnit="1") = {1,0,0}) annotation(Placement(transformation(origin={123,-105.26},
+        displayUnit="1") = {1,0,0}) annotation(Placement(transformation(origin={183,-103.26},
 extent={{10,10},{-10,-10}})));
   Stirling.DoubleActing.DA_Engine_v2 Engine(heff=1.41) 
-    annotation (Placement(transformation(origin={204.75,-82},
+    annotation (Placement(transformation(origin={264.75,-80},
 extent={{-30.75,-28.9},{30.75,28.9}})));
   Fluid.Pipes.pipe Engine_pipe(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium,N=5,L_total=5,m_flow_start=100) 
     annotation (Placement(transformation(origin={71,36},
@@ -61,7 +61,7 @@ rotation=90)));
     annotation (Placement(transformation(origin={37.75,-14},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression1(y=Engine_pipe.T[1]) 
-    annotation (Placement(transformation(origin={177.5,-7.86},
+    annotation (Placement(transformation(origin={237.5,-5.86},
 extent={{-10,-10},{10,10}})));
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
     annotation (Placement(transformation(origin={20,108},
@@ -82,31 +82,31 @@ points={{-284,-4},{-240.20181,-4},{-240.20181,38.8}}));
   annotation(Line(origin={192,8},
 points={{-240.20181,59.2},{-240.20181,88},{-288,88}}));
   connect(world.frame_b, revolute.frame_b) 
-  annotation(Line(origin={131,-130.06},
+  annotation(Line(origin={191,-128.06},
 points={{-50,65.4},{-23.6,65.4},{-23.6,24.8},{-18,24.8}}));
   connect(inertia.flange_b, revolute.axis) 
-  annotation(Line(origin={131,-130.06},
+  annotation(Line(origin={191,-128.06},
 points={{-18,-40},{-8,-40},{-8,14.8}}));
   connect(damper.flange_b, fixed_ground.flange) 
-  annotation(Line(origin={173,-180.06},
+  annotation(Line(origin={241,-178.06},
 points={{-120,10},{-128,10},{-128,-14}},
 color={0,0,0}));
   connect(damper.flange_a, inertia.flange_a) 
-  annotation(Line(origin={87,-170.06},
-points={{-14,0},{6,0}},
+  annotation(Line(origin={215,-166.06},
+points={{-74,-2},{-62,-2}},
 color={0,0,0}));
   connect(world.frame_b, Engine.cylinder_a) 
-  annotation(Line(origin={127.5,-64.86},
+  annotation(Line(origin={187.5,-62.86},
 points={{-46.5,0.2},{46.5,0.2}},
 color={95,95,95},
 thickness=0.5));
   connect(revolute.frame_a, Engine.cylinder_a1) 
-  annotation(Line(origin={153.5,-104.86},
+  annotation(Line(origin={213.5,-102.86},
 points={{-20.5,-0.4},{20.5,-0.4},{20.5,-0.26}},
 color={95,95,95},
 thickness=0.5));
   connect(realExpression1.y, Engine.T_Na) 
-  annotation(Line(origin={194.5,-31.86},
+  annotation(Line(origin={254.5,-29.86},
 points={{-6,24},{10.25,24},{10.25,-15.46}},
 color={0,0,127}));
   connect(prescribedHeatFlow.port, Engine_pipe.wall[1]) 

@@ -99,7 +99,7 @@ public
 public
 
   // ================= 工况(表6/表7) =================
-  parameter SI.Pressure P_m = 1.35e7 "循环平均(充气)压力 [Pa](表6: 工质平均压力13.5MPa; 峰值约14MPa<最高20MPa)" "循环平均(充气)压力 [Pa](表7: 最高20MPa; 仿真压比~1.07, 取18.7MPa使峰值≈20MPa)" annotation(Dialog(tab = "工质与工况", group = "工况"));
+  parameter SI.Pressure P_m = 1.35e7 "循环平均(充气)压力 [Pa](表6: 工质平均压力13.5MPa; 峰值约14MPa<最高20MPa)循环平均(充气)压力 [Pa](表7: 最高20MPa; 仿真压比~1.07, 取18.7MPa使峰值≈20MPa)" annotation(Dialog(tab = "工质与工况", group = "工况"));
   parameter SI.Temperature T_na_nom = 803.15 "标称钠热源温度(表6: 钠进口530°C) [K]" annotation(Dialog(tab = "工质与工况", group = "工况"));
   parameter SI.Temperature T_he_nom = 673.15 "标称热侧气体温度(表6: 氦气400°C, 初值用; 田复现时=壁温1073K) [K]" annotation(Dialog(tab = "工质与工况", group = "工况"));
   parameter SI.Temperature T_water_nom = 303.15 "标称冷却水温度(30°C假设) [K]" annotation(Dialog(tab = "工质与工况", group = "工况"));
@@ -108,7 +108,7 @@ public
 public
 
   // ================= 换热能力(式4-4/4-5/3-28 标定) =================
-  parameter Real U_h = 3.0e4 "B1标定: @530℃吸热≈1.0MW/组(40组=40MW)" "热侧换热能力= h_h·Awg_h(式4-4) [W/K]; 标定(式4-5): Q_h_cyc=1MW/(T_na-T_he)=1e6/130≈7.7e3, 等价h_h≈15.3kW/(m2·K)(20MPa He管内强制对流假设)" annotation(Dialog(tab = "换热能力", group = "换热器"));
+  parameter Real U_h = 3.0e4 "B1标定: @530℃吸热≈1.0MW/组(40组=40MW)热侧换热能力= h_h·Awg_h(式4-4) [W/K]; 标定(式4-5): Q_h_cyc=1MW/(T_na-T_he)=1e6/130≈7.7e3, 等价h_h≈15.3kW/(m2·K)(20MPa He管内强制对流假设)" annotation(Dialog(tab = "换热能力", group = "换热器"));
   parameter Real U_c = 2.0e5 "冷侧换热能力= h_c·Awg_c [W/K]; 标定: Q_c_cyc≈0.7MW, 冷侧气体≈325K(高于水温~22K)" annotation(Dialog(tab = "换热能力", group = "换热器"));
   parameter Real U_reg = 1.0e6 "回热器总换热能力= 2·h·Awg(式3-28集总到链式, 逐节点U_reg/n_reg) [W/K]; 标定: 丝网湿面积Awg≈32m2×h≈1560W/(m2·K), 目标eps≈0.94~0.98(田论文4.4节eps≈0.98)" annotation(Dialog(tab = "换热能力", group = "回热器"));
   parameter SI.Mass m_reg_mat = 6.0 "回热器网阵总质量 [kg](环形体积2.67e-3m3×网阵占30%×钢密度7800≈6.25, 表7未给材料, 假设不锈钢)" annotation(Dialog(tab = "换热能力", group = "回热器"));

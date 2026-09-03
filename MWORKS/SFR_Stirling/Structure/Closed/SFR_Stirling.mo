@@ -5,7 +5,7 @@ grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=fa
     SFR.Fluid.Vessels.ExpansionTank expansionTank(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, A=1, V0=0.001, level_start=1, h_start=656775 "热段550℃", p_start=100000.0) 
       annotation (Placement(transformation(origin={50.0181,160},
 extent={{-10,-10},{10,10}})));
-    TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+    TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,use_input=true) 
       annotation (Placement(transformation(origin={46.0181,-126.018},
 extent={{10,-10},{-10,10}})));
     TYThermoFluidSys.Blocks.Constant const2(k=823.15) 
@@ -14,8 +14,8 @@ extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[3] * 0.2237 + outerCore.T[3] * 0.7763) 
       annotation (Placement(transformation(origin={-357.982,-56.5},
 extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=0, duration=100, startTime=400) 
-      annotation (Placement(transformation(origin={-572,14.4013},
+    TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=30, startTime=1200) 
+      annotation (Placement(transformation(origin={-564,14.4013},
 extent={{-10,-10},{10,10}})));
     TYThermoFluidSys.Blocks.Constant const3(k=0) 
       annotation (Placement(transformation(origin={-323.982,64.5},
@@ -35,7 +35,7 @@ extent={{-10,-10},{10,10}})));
     Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
       annotation (Placement(transformation(origin={-480,8.4013},
 extent={{-10,-10},{10,10}})));
-    Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.SteadyState) 
+    Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.NoInit) "NoInit：避免与 PointKinetics.Q_fission(fixed=true) 初始条件冗余 6142（2026-09-01；与 PrimaryLoop 一致）" 
       annotation (Placement(transformation(origin={-435.991,14.4013},
 extent={{-10,-10},{10,10}})));
     SFR.Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K"), Teffref_coolant(displayUnit="degC")=768.15 "参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
@@ -60,9 +60,6 @@ extent={{-10,-10},{10,10}})));
 extent={{-6,-6},{6,6}})));
     SFR.Fluid.Vessels.SpecifiedResistance resistance_toBoundary(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
       annotation (Placement(transformation(origin={68.0180755,124},
-extent={{-10,-10},{10,10}})));
-    TYThermoFluidSys.Sensors.SensorT TSensor2(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={-72.9819,118},
 extent={{-10,-10},{10,10}})));
     Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_inner[4] 
       annotation (Placement(transformation(origin={-201.982,0},
@@ -141,14 +138,11 @@ rotation=90)));
       annotation (Placement(transformation(origin={-26,0},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-    TYThermoFluidSys.Sensors.SensorT TSensor1(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
-      annotation (Placement(transformation(origin={-225.982,66},
-extent={{-10,-10},{10,10}})));
     SFR.Thermal.HeatExchange.HE1 hE1_1(shell(momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState)) 
       annotation (Placement(transformation(origin={152.029,8.009},
 extent={{10,10},{-10,-10}},
 rotation=90)));
-    TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+    TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,use_input=true) 
       annotation (Placement(transformation(origin={214.5,58},
 extent={{10,-10},{-10,10}})));
     Modelica.Blocks.Sources.RealExpression realExpression2(y=Engine_pipe.T[1]) 
@@ -198,15 +192,17 @@ extent={{-10,-10},{10,10}})));
       nPorts_a=1, nPorts_b=1, V=1, h_start=654480 "HE1出口530℃(设计剖面初值)") 
       annotation(Placement(transformation(origin={218.5,-14},
 extent={{-10,-10},{10,10}})));
+    TYThermoFluidSys.Blocks.Ramp ramp1(offset=280.6, height=-84.18, duration=30, startTime=1800) 
+      annotation (Placement(transformation(origin={30,-92},
+extent={{-10,-10},{10,10}})));
+    TYThermoFluidSys.Blocks.Ramp ramp2(offset=308.4, height=-92.52, duration=50, startTime=1800) 
+      annotation (Placement(transformation(origin={180,90},
+extent={{-10,-10},{10,10}})));
     equation
     connect(innerCore_out.portB, volume.port_a[1]) 
     annotation(Line(origin={-103.982,6},
 points={{-79.9819,28.0222},{-79.9819,48},{6,48},{6,64}},
 color={0,127,255}));
-    connect(TSensor1.port_a, innerCore_out.portB) 
-    annotation(Line(origin={-138.482,6},
-points={{-87.5,50},{-87.5,31.0222},{-45.4819,31.0222},{-45.4819,28.0222}},
-color={0,178,226}));
     connect(outerCore_out.portB, volume.port_a[2]) 
     annotation(Line(origin={-128.982,6},
 points={{31.0181,28.0222},{31,64}},
@@ -303,10 +299,6 @@ color={127,0,0}));
     annotation(Line(origin={-174.982,6},
 points={{56,-6},{73.2,-6}},
 color={127,0,0}));
-    connect(TSensor2.port_a, volume.port_b[1]) 
-    annotation(Line(origin={-103.982,6},
-points={{31,102},{31,92},{6,92},{6,76}},
-color={0,178,226}));
     connect(pointKinetics.Q_total, gain_uM.u) 
     annotation(Line(origin={-118.982,0.51625},
 points={{-150.885,13.68},{-147.13,13.68},{-147.13,-46.51625},{-371.018,-46.51625},{-371.018,-30.51625},{-367.018,-30.51625}},
@@ -333,7 +325,7 @@ points={{-190.755,-5.8975},{-228,-5.89755}},
 color={0,0,127}));
     connect(ramp.y, gain_uS.u) 
     annotation(Line(origin={-463.982,16},
-points={{-97.018,-1.5987},{-66.018,-1.5987}},
+points={{-89.018,-1.5987},{-66.018,-1.5987}},
 color={0,0,127}));
     connect(gain_uS.y, PID_error.u1) 
     annotation(Line(origin={-433.982,16},
@@ -438,4 +430,12 @@ color={0,127,255}));
     annotation(Line(origin={229,-56},
 points={{22,-8.76},{36.5,-8.76},{36.5,8}},
 color={0,0,127}));
+    connect(ramp1.y, pump1.in_m_flow) 
+    annotation(Line(origin={44,-105},
+    points={{-3,13},{2.0181,13},{2.0181,-13.718}},
+    color={0,0,127}));
+    connect(ramp2.y, pump2.in_m_flow) 
+    annotation(Line(origin={203,78},
+    points={{-12,12},{11.5,12},{11.5,-12.7}},
+    color={0,0,127}));
     end SFR_Stirling;

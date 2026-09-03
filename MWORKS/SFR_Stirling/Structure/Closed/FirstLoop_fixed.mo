@@ -38,7 +38,7 @@ extent={{-18,-20.5},{18,20.5}})));
   // [2026-08-29 修复] 原 LimPID 限幅用零交叉实现: PID 输出贴 ±0.021 后在浮点噪声级无限触发事件(日志 addFF.y>0.021 每秒百万次), 时间钉死在 0.0006s 卡 t=0。
   // 修复: ①输入归一化(功率差/40e6 无量纲化, 原 k=2 直接乘 40e6 量级误差必打满限幅); ②参数重标定 k=0.5/Ti=100/Td=0;
   //   ③限幅改用连续 Limiter(纯 min/max, 无零交叉事件), 保留物理限幅语义 ±0.021。
-  Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.SteadyState) 
+  Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.NoInit) "NoInit：避免与 PointKinetics.Q_fission(fixed=true) 初始条件冗余 6142（2026-09-01；与 PrimaryLoop/SFR_Stirling 一致）" 
     annotation (Placement(transformation(origin={-330,8.4013},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
@@ -59,7 +59,7 @@ extent={{-10,-10},{10,10}})));
   TYThermoFluidSys.Blocks.Constant const3(k=0) 
     annotation (Placement(transformation(origin={-220,58.5},
 extent={{-10,-10},{10,10}})));
-  TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=0, duration=100, startTime=400) 
+  TYThermoFluidSys.Blocks.Ramp ramp(offset=40e6, height=4e6, duration=50, startTime=1800) 
     annotation (Placement(transformation(origin={-460,8.4},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[3] * 0.2237 + outerCore.T[3] * 0.7763) 
