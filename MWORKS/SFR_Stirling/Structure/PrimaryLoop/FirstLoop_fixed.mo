@@ -1,4 +1,3 @@
-within SFR.Structure.Closed;
 model FirstLoop_fixed
   "一回路模型（堆芯三通道+轴向三段版）"
   // ================= 设计依据（任务 SFR-20260821-01，2026-08-21） =================

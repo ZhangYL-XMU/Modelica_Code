@@ -1,4 +1,4 @@
-model PrimaryLoop
+model PrimaryLoop_flowDown
   annotation(__MWORKS(version="26.6.0"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})));
   Fluid.Pipes.pipe pipe_static1(N=5, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, L_total=10, Dh=0.30, initFromEnthalpy=true, h_start=656775 "热段550℃", wallHeatTransfer=false, momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState) 
@@ -15,40 +15,25 @@ rotation=90)));
     annotation (Placement(transformation(origin={4.99444,-106.991},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  Nuclear.PointKinetics pointKinetics(Teffref_fuel(displayUnit="K")=864.05 "fuel ref = 864.05 K (rated mean weighted wall T; mirror coolant ref 768.15)", Teffref_coolant(displayUnit="degC")=768.15 "参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
-    annotation (Placement(transformation(origin={-146,106.43},
+  Nuclear.PointKinetics pointKinetics(Teffref_fuel=863.2 "燃料参考=额定份额加权管道壁温K(2026-09-06 标定)", Teffref_coolant(displayUnit="degC")=768.29 "冷却剂参考(2026-09-06 标定; 原768.15为旧口径)参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
+    annotation (Placement(transformation(origin={-162,63.009},
 extent={{-18,-20.5},{18,20.5}})));
-  Modelica.Blocks.Continuous.PID PID(k=0.5, Ti=100, Td=0, initType=Modelica.Blocks.Types.Init.NoInit) 
-    annotation (Placement(transformation(origin={-290,120.831},
-extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Math.Add PID_error(k1=1, k2=-1) "误差 e=u_s-u_m (归一化后)" 
-    annotation (Placement(transformation(origin={-332,120.831},
-extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Nonlinear.Limiter limPID(uMin=-0.021, uMax=0.021) 
-    annotation (Placement(transformation(origin={-248,120.83},
-extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Math.Gain gain_uS(k=1/40e6) "u_s 归一化(ramp W→无量纲)" 
-    annotation (Placement(transformation(origin={-384,120.831},
-extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Math.Gain gain_uM(k=1/40e6) "u_m 归一化(Q_total W→无量纲)" 
-    annotation (Placement(transformation(origin={-364,90.9009},
+  Modelica.Blocks.Sources.Constant constCR(k=0) "无PID：控制棒反应性恒为0（自稳验证）" 
+    annotation (Placement(transformation(origin={-238,116},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.Constant const1(k=0) 
-    annotation (Placement(transformation(origin={-214,142.93},
+    annotation (Placement(transformation(origin={-238,84.309},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.Constant const3(k=0) 
-    annotation (Placement(transformation(origin={-180,170.93},
-extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Sources.Constant ramp(k=40e6) "参考功率 40MW（恒定；原 TY Ramp(offset=40e6,height=0) 语义等价——MSL Ramp 在 Sysplorer 下 time<startTime 时输出 0，曾导致参考信号归零、CR 满插压堆，2026-09-01 修复）" 
-    annotation (Placement(transformation(origin={-420,120.83},
+    annotation (Placement(transformation(origin={-200,144},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression1(y=innerCore.T[6] * 0.2237 + outerCore.T[6] * 0.7763 "coolant eff. T at axial mid (mirror Teffref=768.15K)") 
-    annotation (Placement(transformation(origin={-184,90.9009},
+    annotation (Placement(transformation(origin={-200,47.4799},
 extent={{-10,-10},{10,10}})));
-  Modelica.Blocks.Sources.RealExpression realExpression4(y=tubeWall.T[6] * 0.2237 + tubeWall1.T[6] * 0.7763 "fuel eff. T from TubeWall states (mirror coolant input; wall temp as fuel lump)") 
-    annotation (Placement(transformation(origin={-214,101.048},
+  Modelica.Blocks.Sources.RealExpression realExpression4(y=innerCore.T_wall[6] * 0.2237 + outerCore.T_wall[6] * 0.7763 "fuel eff. T: 份额加权管道壁温(09-06 无PID标定口径; 原 tubeWall 组件已不存在)") 
+    annotation (Placement(transformation(origin={-230,57.627},
 extent={{-10,-10},{10,10}})));
-  TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium) 
+  TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump1(m_flow_nominal=280.6, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,use_input=true) 
     annotation (Placement(transformation(origin={148.994435,-113.009},
 extent={{10,-10},{-10,10}})));
   Fluid.Vessels.ExpansionTank expansionTank(redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, A=1, V0=0.001, level_start=1, h_start=656775 "热段550℃", p_start=100000.0) 
@@ -61,7 +46,7 @@ extent={{-10,-10},{10,10}})));
     annotation (Placement(transformation(origin={255.005565,21.018},
 extent={{10,10},{-10,-10}},
 rotation=90)));
-  Modelica.Fluid.Sources.MassFlowSource_T boundary3(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, m_flow=308.4, T(displayUnit="degC")=703.15) 
+  Modelica.Fluid.Sources.MassFlowSource_T boundary3(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, m_flow=308.4, T(displayUnit="degC")=703.15,use_m_flow_in=true) 
     annotation (Placement(transformation(origin={341.005565,-40.982},
 extent={{10,-10},{-10,10}})));
   Modelica.Fluid.Sources.Boundary_pT boundary2(nPorts=1, redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium, T=803.15, p=100000) 
@@ -86,7 +71,7 @@ rotation=90)));
   Fluid.Pipes.pipe innerCore(
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=11, n_pipe=37, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1,
-    initFromEnthalpy=true, h_start=519165, wallHeatTransfer=true,
+    initFromEnthalpy=true, h_start=607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer=true,
     momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.695 "单管62.7/37") 
     annotation (Placement(transformation(origin={-81.0056,13.009},
 extent={{-10,-10},{10,10}},
@@ -110,7 +95,7 @@ rotation=90)));
   Fluid.Pipes.pipe outerCore(
     redeclare package Medium = SFR.Media.Sodium.ConstantPropertyLiquidSodium,
     N=11, n_pipe=114, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1,
-    initFromEnthalpy=true, h_start=519165, wallHeatTransfer=true,
+    initFromEnthalpy=true, h_start=607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer=true,
     momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.907 "单管217.4/114") 
     annotation (Placement(transformation(origin={4.99444,13.009},
 extent={{-10,-10},{10,10}},
@@ -136,23 +121,23 @@ rotation=90)));
 extent={{-10,-10},{10,10}},
 rotation=90)));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_inner[10] 
-    annotation (Placement(transformation(origin={-134,13.009},
+    annotation (Placement(transformation(origin={-106,13.009},
 extent={{-6,-6},{6,6}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow_outer[10] 
     annotation (Placement(transformation(origin={-42,13.009},
 extent={{-6,-6},{6,6}})));
-  Thermal.Volumes.TubeWall tubeWall(N=10, n_tubes=37, r_inner=0.0028, r_outer=0.003, length=1.1, T_start=823.15 "wall init 550C") 
-    annotation (Placement(transformation(origin={-113.0056,13.009},
-extent={{10,-10},{-10,10}})));
-  Thermal.Volumes.TubeWall tubeWall1(N=10, n_tubes=114, r_inner=0.0028, r_outer=0.003, length=1.1, T_start=823.15 "wall init 550C") 
-    annotation (Placement(transformation(origin={-16,13.009},
-extent={{10,-10},{-10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression2[10] (y=pointKinetics.Q_total * 0.2237 / 10 "inner 22.37% (2026-09-01 cal)") 
-    annotation (Placement(transformation(origin={-166,13.009},
+    annotation (Placement(transformation(origin={-138,13.009},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression3[10] (y=pointKinetics.Q_total * 0.7763 / 10 "outer 77.63% (2026-09-01 cal)") 
     annotation (Placement(transformation(origin={-46,44},
 extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Sources.Ramp ramp(offset=280.6,startTime=1200,duration=60,height=-84.18) 
+    annotation (Placement(transformation(origin={121.994,-70},
+extent={{-10,-10},{10,10}})));
+  Modelica.Blocks.Sources.Ramp ramp1(offset=308.4,startTime=1200,duration=60,height=-92.52) 
+    annotation (Placement(transformation(origin={380,-32.982},
+extent={{10,-10},{-10,10}})));
   equation
   connect(innerCore_out.portB, volume.port_a[1]) 
   annotation(Line(origin={-1.00556,19.009},
@@ -206,49 +191,21 @@ extent={{-10,-10},{10,10}})));
   annotation(Line(origin={-1.00556,19.009},
   points={{6,-120},{6,-78}},
   color={0,127,255}));
-  connect(pointKinetics.Q_total, gain_uM.u) 
-  annotation(Line(origin={25.0004,106.946},
-points={{-150.8854,13.6803},{-147.1304,13.6803},{-147.1304,-56.946},{-405.0004,-56.946},{-405.0004,-16.0451},{-401.0004,-16.0451}},
-color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
-  connect(gain_uM.y, PID_error.u2) 
-  annotation(Line(origin={-280,100.43},
-points={{-73,-9.52875},{-68,-9.52875},{-68,14.4013},{-64,14.4013}},
-color={0,0,127}));
   connect(const1.y, pointKinetics.Reactivity_Other) 
-  annotation(Line(origin={25.0004,106.946},
-points={{-228.0004,35.98375},{-200,35.98375},{-200,4.25},{-190.7554,4.25}},
+  annotation(Line(origin={9.0004,63.525},
+points={{-236.0004,20.784},{-209.0004,20.784},{-209.0004,4.25025},{-190.7554,4.25025}},
 color={0,0,127}));
   connect(realExpression1.y, pointKinetics.Teff_coolant) 
-  annotation(Line(origin={25.0004,106.946},
-points={{-198.0004,-16.045},{-190.7554,-16.045}},
+  annotation(Line(origin={9.0004,63.525},
+points={{-198.0004,-16.0451},{-190.7554,-16.0447}},
 color={0,0,127}));
   connect(const3.y, pointKinetics.Q_in) 
-  annotation(Line(origin={25.0004,106.946},
-points={{-194.0004,63.98375},{-171.3154,63.98375},{-171.3154,22.085}},
+  annotation(Line(origin={9.0004,63.525},
+points={{-198.0004,80.475},{-171.3154,80.475},{-171.3154,22.0853}},
 color={0,0,127}));
   connect(realExpression4.y, pointKinetics.Teff_fuel) 
-  annotation(Line(origin={25.0004,106.946},
-points={{-190.7554,-5.8975},{-228.0004,-5.89755}},
-color={0,0,127}));
-  connect(ramp.y, gain_uS.u) 
-  annotation(Line(origin={-320,122.43},
-points={{-89,-1.6},{-76,-1.5987}},
-color={0,0,127}));
-  connect(gain_uS.y, PID_error.u1) 
-  annotation(Line(origin={-290,122.43},
-points={{-83,-1.5987},{-58,-1.5987},{-58,4.4013},{-54,4.4013}},
-color={0,0,127}));
-  connect(PID_error.y, PID.u) 
-  annotation(Line(origin={-282,112.43},
-points={{-39,8.4013},{-20,8.4013}},
-color={0,0,127}));
-  connect(PID.y, limPID.u) 
-  annotation(Line(origin={-262,120.43},
-points={{-17,0.4013},{2,0.4}},
-color={0,0,127}));
-  connect(limPID.y, pointKinetics.Reactivity_CR) 
-  annotation(Line(origin={25.0004,106.946},
-points={{-262,13.88375},{-190.7554,13.885}},
+  annotation(Line(origin={9.0004,63.525},
+points={{-228.0004,-5.898},{-190.7554,-5.89725}},
 color={0,0,127}));
   connect(volume.port_b[1], pipe_static1.portA) 
   annotation(Line(origin={-1.00556,19.009},
@@ -286,28 +243,33 @@ color={0,0,127}));
   annotation(Line(origin={-1.00556,19.009},
   points={{316,44},{262.00932,44},{262.00932,12.209}},
   color={0,127,255}));
-  connect(tubeWall.port_a, innerCore.wall) 
-  annotation(Line(origin={-94,13},
-  points={{-9.0056,0.009},{9.1944,0.009}},
-  color={191,0,0}));
-  connect(tubeWall.port_b, prescribedHeatFlow_inner.port) 
-  annotation(Line(origin={-129,13},
-points={{5.9944,0.009},{1,0.009}},
-color={191,0,0}));
-  connect(outerCore.wall, tubeWall1.port_a) 
-  annotation(Line(origin={-2,13},
-  points={{3.19444,0.009},{-4,0.009}},
-  color={127,0,0}));
-  connect(prescribedHeatFlow_outer.port, tubeWall1.port_b) 
-  annotation(Line(origin={-31,13},
-  points={{-5,0.009},{5,0.009}},
-  color={191,0,0}));
   connect(realExpression2.y, prescribedHeatFlow_inner.Q_flow) 
-  annotation(Line(origin={-147,13},
-  points={{-8,0.009},{7,0.009}},
-  color={0,0,127}));
+  annotation(Line(origin={-119,13},
+points={{-8,0.009},{7,0.009}},
+color={0,0,127}));
   connect(prescribedHeatFlow_outer.Q_flow, realExpression3.y) 
   annotation(Line(origin={-52,13},
 points={{4,0.009},{0.8,0.009},{0.8,8.009},{20,8.009},{20,31},{17,31}},
 color={0,0,127}));
-  end PrimaryLoop;
+  connect(outerCore.wall, prescribedHeatFlow_outer.port) 
+  annotation(Line(origin={-17,13},
+  points={{18.19444,0.009},{-19,0.009}},
+  color={127,0,0}));
+  connect(prescribedHeatFlow_inner.port, innerCore.wall) 
+  annotation(Line(origin={-106,13},
+points={{6,0.009},{21.1944,0.009}},
+color={191,0,0}));
+
+  connect(constCR.y, pointKinetics.Reactivity_CR) 
+  annotation(Line(origin={9.0004,63.525},
+points={{-236.0004,52.475},{-201.0004,52.475},{-201.0004,13.8853},{-190.7554,13.8853}},
+color={0,0,127}));
+  connect(ramp.y, pump1.in_m_flow) 
+  annotation(Line(origin={146,-88},
+points={{-13.006,18},{2.99444,18},{2.99444,-17.709}},
+color={0,0,127}));
+  connect(boundary3.m_flow_in, ramp1.y) 
+  annotation(Line(origin={360,-33},
+  points={{-8.99444,0.018},{9,0.018}},
+  color={0,0,127}));
+end PrimaryLoop_flowDown;

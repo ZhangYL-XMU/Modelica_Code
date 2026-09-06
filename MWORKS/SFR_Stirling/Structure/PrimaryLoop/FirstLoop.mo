@@ -1,4 +1,3 @@
-within SFR.Structure.Closed;
   model FirstLoop
     annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=3600,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=3600,StoreEventValue=0,Tolerance=0.0001));

@@ -17,8 +17,11 @@ extent={{-10,-10},{10,10}})));
 extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Damper damper(d=10.6) "发电负载（转速校准→1500rpm）发电负载 250kW@1500rpm 等效" annotation(Placement(transformation(origin={-73.75,-68.06},
 extent={{10,-10},{-10,10}})));
-  Modelica.Blocks.Sources.Ramp ramp(offset=273.15+530,startTime=1800,duration=100) 
-    annotation (Placement(transformation(origin={14,90},
+  Modelica.Blocks.Sources.Ramp ramp(offset=273.15+530,startTime=1800,duration=100) if false 
+    annotation (Placement(transformation(origin={148,90},
+extent={{-10,-10},{10,10}})));
+  TYThermoFluidSys.Blocks.Constant const(k=273.15+530) 
+    annotation (Placement(transformation(origin={10,86},
 extent={{-10,-10},{10,10}})));
   equation
   connect(world.frame_b, revolute.frame_b) 
@@ -45,8 +48,8 @@ thickness=0.5));
 points={{-20.5,-0.4},{51.25,-0.4},{51.25,22.86}},
 color={95,95,95},
 thickness=0.5));
-  connect(ramp.y, Engine.T_Na) 
-  annotation(Line(origin={43,72},
-  points={{-18,18},{17,18},{17,-17.32}},
+  connect(const.y, Engine.T_Na) 
+  annotation(Line(origin={41,70},
+  points={{-20,16},{19,16},{19,-15.32}},
   color={0,0,127}));
   end Stirling;

@@ -1,8 +1,5 @@
-FirstLoop_without_Reactor
-FirstLoop
-FirstLoop_fixed
-PrimaryLoop
 SecondLoop
 SFR_Stirling
 SFR_Stirling_PK
-SFR_Stirling_Steady
+SFR_Stirling_Steady_noPID
+SFR_flowDown

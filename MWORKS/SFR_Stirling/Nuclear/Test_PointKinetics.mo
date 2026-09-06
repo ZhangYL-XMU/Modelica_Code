@@ -7,15 +7,15 @@ model Test_PointKinetics
     annotation (Placement(transformation(origin={-96,-20.3633}, extent={{-10,
             -10},{10,10}})));
   Modelica.Blocks.Sources.Constant const2(k=0) 
-    annotation (Placement(transformation(origin={-96,29.4137}, extent={{-10,
-            -10},{10,10}})));
+    annotation (Placement(transformation(origin={-96,29.4137},
+extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.Constant const4(k=0) 
     annotation (Placement(transformation(origin={-42,106}, extent={{-10,-10},
             {10,10}})));
   Modelica.Blocks.Sources.Ramp ramp(offset=823.15,height=0,startTime=100,duration=20) 
     annotation (Placement(transformation(origin={-136,4.52517}, extent={{-10,
             -10},{10,10}})));
-  Modelica.Blocks.Sources.Ramp ramp1(offset=0,height=-0.01,startTime=100,duration=20) 
+  Modelica.Blocks.Sources.Ramp ramp1(offset=0,height=0,startTime=100,duration=20) 
     annotation (Placement(transformation(origin={-120,53.0452},
 extent={{-10,-10},{10,10}})));
 equation
@@ -29,8 +29,8 @@ equation
       color={0,0,127}));
   connect(kinetics.Reactivity_Other, const2.y) 
   annotation(Line(origin={-68,29},
-  points={{17.7837,0.413684},{-17,0.413684}},
-  color={0,0,127}));
+points={{17.7837,0.413684},{-17,0.413684}},
+color={0,0,127}));
   connect(kinetics.Reactivity_CR, ramp1.y) 
   annotation(Line(origin={-68,53},
 points={{17.7837,0.0452021},{-41,0.0452021}},
