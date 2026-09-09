@@ -1,4 +1,4 @@
-model FirstLoop_fixed
+model v1_fixed
   "一回路模型（堆芯三通道+轴向三段版）"
   // ================= 设计依据（任务 SFR-20260821-01，2026-08-21） =================
   // 三通道并联（尹凯 RELAP 104/105/106）：innerCore 圈1~4 37 组件 8948.31 kW(22.37%)
@@ -282,4 +282,4 @@ grid={2,2})));
   annotation(Line(origin={-32,-6},
   points={{5,0},{-5,8.88178e-16}},
   color={0,0,127}));
-end FirstLoop_fixed;
+end v1_fixed;

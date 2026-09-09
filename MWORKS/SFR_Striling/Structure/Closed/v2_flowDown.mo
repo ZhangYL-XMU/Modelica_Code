@@ -9,7 +9,7 @@ rotation=90)));
     annotation (Placement(transformation(origin={-134.256,53.5},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-  Fluid.Pipes.pipe outerCore(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, N=11, n_pipe=114, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1, initFromEnthalpy=true, h_start=607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer=true, momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.907 "单管217.4/114") 
+  Fluid.Pipes.pipe outerCore(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, N=11, n_pipe=114, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1, initFromEnthalpy=true, h_start=607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer=true, momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.907 "单管217.4/114",redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.core) 
     annotation (Placement(transformation(origin={-134.256,29.5},
 extent={{-10,-10},{10,10}},
 rotation=90)));
@@ -20,7 +20,7 @@ rotation=90)));
   Modelica.Blocks.Sources.RealExpression realExpression3[10] (y=pointKinetics.Q_total * 0.7763 / 10 "outer 77.63% (2026-09-01 cal)") 
     annotation (Placement(transformation(origin={-185.25,60.491},
 extent={{-10,-10},{10,10}})));
-  Fluid.Pipes.pipe innerCore(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, N=11, n_pipe=37, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1, initFromEnthalpy=true, h_start=607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer=true, momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.695 "单管62.7/37") 
+  Fluid.Pipes.pipe innerCore(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, N=11, n_pipe=37, L_total=1.1, L_heat=1.1, Dh=0.0415, height_ab=-1.1, initFromEnthalpy=true, h_start=607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer=true, momentumDynamics=Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start=1.695 "单管62.7/37",redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.core) 
     annotation (Placement(transformation(origin={-220.256,29.5},
 extent={{-10,-10},{10,10}},
 rotation=90)));

@@ -1,4 +1,4 @@
-  model FirstLoop
+  model v1
     annotation(__MWORKS(version="26.1.3",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=3600,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=3600,StoreEventValue=0,Tolerance=0.0001));
     TYThermoFluidSys.Sensors.SensorT TSensor1(redeclare package Medium = SFR_Striling.Media.Sodium.ConstantPropertyLiquidSodium) 
@@ -197,4 +197,4 @@ color={0,127,255}));
     annotation(Line(origin={-123,-6},
     points={{-27.885,0},{28,0}},
     color={0,0,127}));
-    end FirstLoop;
+    end v1;

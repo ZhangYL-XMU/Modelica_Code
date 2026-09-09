@@ -1,12 +1,11 @@
 model Test_Engine_v3
-  annotation(__MWORKS(version="26.6.0",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=50,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.001,StartTime=0,StopTime=50,StoreEventValue=0,Tolerance=0.0001));
+  annotation(__MWORKS(version="26.6.0",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=30,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
+grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.001,StartTime=0,StopTime=30,StoreEventValue=0,Tolerance=0.0001));
   Modelica.Mechanics.Rotational.Components.Damper damper(d=10.30) annotation(Placement(transformation(origin={-135.75,-97.16},
 extent={{10,-10},{-10,10}})));
   Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={-153.75,-121.16},
 extent={{-10,-10},{10,10}})));
-  parameter Modelica.Units.SI.AngularVelocity w_start = 100 "初始角速度 [rad/s]";
-  Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=w_start, fixed=true)) 
+  Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=100, fixed=true)) 
     annotation(Placement(transformation(origin={-95.75,-97.16},
 extent={{-10,-10},{10,10}})));
   inner Modelica.Mechanics.MultiBody.World world 
@@ -18,11 +17,8 @@ extent={{10,10},{-10,-10}})));
   DA_Engine_v3 Engine(U_h=2.0e4, U_c=4.5e5, U_reg=3.0e6, heff_Na=1.53, heff_water=1.0) 
     annotation (Placement(transformation(origin={6,-9.1},
 extent={{-30.75,-28.9},{30.75,28.9}})));
-  Modelica.Blocks.Sources.Ramp ramp(offset=654480, height=0, startTime=5, duration=10) 
-    annotation (Placement(transformation(origin={-109.25,103.058},
-extent={{-10,-10},{10,10}})));
-  Modelica.Fluid.Sources.MassFlowSource_h boundary(nPorts=1, redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, h=656857, m_flow=308.4, use_h_in=true) 
-    annotation(Placement(transformation(origin={-65.25,99.0580755},
+  Modelica.Blocks.Sources.Ramp ramp(offset=273.15 +530, height=0, startTime=0, duration=0) 
+    annotation (Placement(transformation(origin={-114,95.0580755},
 extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Sources.Boundary_ph boundary1(nPorts=1, redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, p=9.999999999999999e5, h=527257) 
     annotation(Placement(transformation(origin={58.75,99.04},
@@ -62,6 +58,10 @@ extent={{-10,-10},{10,10}})));
     annotation (Placement(transformation(origin={48.75,41.32},
 extent={{-10,-10},{10,10}},
 rotation=90)));
+  Modelica.Fluid.Sources.MassFlowSource_T boundary3(nPorts=1,redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium,m_flow=308.4,T=273.15 +530,use_T_in=true) 
+    annotation (Placement(transformation(origin={-61.25,99.0580755},
+extent={{10,-10},{-10,10}},
+rotation=180)));
   equation
   connect(world.frame_b, revolute.frame_b) 
   annotation(Line(origin={-67.75,-57.16},
@@ -77,10 +77,6 @@ color={0,0,0}));
   annotation(Line(origin={-111.75,-97.16},
 points={{-14,0},{6,0}},
 color={0,0,0}));
-  connect(ramp.y, boundary.h_in) 
-  annotation(Line(origin={-103.25,103.04},
-points={{5,0.0180755},{26,0.0180755}},
-color={0,0,127}));
   connect(world.frame_b, Engine.cylinder_a) 
   annotation(Line(origin={-71.25,8.04},
 points={{-46.5,0.2},{46.5,0.2}},
@@ -95,10 +91,6 @@ thickness=0.5));
   annotation(Line(origin={-4.25,41.04},
 points={{-38,0.28},{-8.2,0.28},{-8.2,-15.46}},
 color={0,0,127}));
-  connect(boundary.ports[1], Engine_pipe.portA) 
-  annotation(Line(origin={-41.25,99.022},
-points={{-14,0.0360755},{30.02226,0.0360755}},
-color={0,127,255}));
   connect(Engine_pipe.portB, boundary1.ports[1]) 
   annotation(Line(origin={49.75,99.022},
 points={{-40.9778,0.0360755},{-1,0.018}},
@@ -162,5 +154,13 @@ color={0,0,127}));
   connect(gain1.y, prescribedHeatFlow[4].Q_flow) 
   annotation(Line(origin={23.75,56.04},
 points={{25,-3.72},{25,-0.72},{-25,-0.72},{-25,2.982}},
+color={0,0,127}));
+  connect(Engine_pipe.portA, boundary3.ports[1]) 
+  annotation(Line(origin={-31,99},
+  points={{19.77226,0.0580755},{-20.25,0.0580755}},
+  color={0,127,255}));
+  connect(boundary3.T_in, ramp.y) 
+  annotation(Line(origin={-85,95},
+points={{11.75,0.0580755},{-18,0.0580755}},
 color={0,0,127}));
   end Test_Engine_v3;

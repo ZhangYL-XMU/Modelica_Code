@@ -124,7 +124,7 @@ equation
   Power_nt=nt;
   // FirstLoop 双通道语义：热通道（圈8）份额 = 7634.21/40000 = 0.19085525（侯斌表3）
   // 注意：FirstLoop_fixed 三通道模型不使用这两个输出，改用 Q_total×0.2237/0.7763（内外堆芯份额）
-  Q_innerCore = Q_total * 0.19085525;
+  Q_innerCore = Q_total * 0.2237;
   Q_outerCore = Q_total - Q_innerCore;
 
 //功率计算

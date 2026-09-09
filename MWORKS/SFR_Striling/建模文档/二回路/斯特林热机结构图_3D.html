@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4 缸双作用斯特林机 · 三维模型</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#eef2f6;
+            font-family:'Microsoft YaHei','PingFang SC','Segoe UI',sans-serif;color:#1f2933}
+  #gl{display:block;width:100vw;height:100vh}
+  #hud{position:fixed;left:18px;top:14px;pointer-events:none;user-select:none;max-width:62vw}
+  #hud h1{margin:0;font-size:19px;font-weight:700}
+  #hud p{margin:5px 0 0;font-size:12.5px;color:#54626f;line-height:1.5}
+  #bar{position:fixed;left:18px;bottom:16px;display:flex;gap:8px;align-items:center;
+       background:rgba(255,255,255,.88);border:1px solid #d8e0e7;border-radius:10px;
+       padding:7px 10px;box-shadow:0 2px 10px rgba(30,45,60,.08)}
+  #bar button{font:inherit;font-size:12.5px;color:#1f2933;background:#fff;border:1px solid #cfd8e0;
+              border-radius:7px;padding:5px 11px;cursor:pointer}
+  #bar button:hover{background:#f2f6fa}
+  #bar button.on{background:#e8f2fb;border-color:#8fbfe4;color:#0e5a92}
+  #bar .hint{font-size:12px;color:#7c8894;margin-left:4px}
+  #labels{position:fixed;inset:0;pointer-events:none}
+  .lab{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-size:12px;
+       color:#1f2933;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 4px #fff,0 0 4px #fff}
+  .lab.b{font-weight:700}
+  .lab.hot{color:#a8321a}.lab.cold{color:#0e5a92}.lab.reg{color:#5e4485}
+  .lab.na{color:#c0530f;font-weight:700}.lab.w{color:#12659c;font-weight:700}
+  .lab.k{color:#2c3e50;font-weight:700}.lab.sm{font-size:11px;color:#54626f}
+  #err{position:fixed;inset:0;display:none;place-items:center;background:#eef2f6;font-size:15px}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="hud">
+  <h1>4 缸双作用斯特林机 · 三维模型</h1>
+  <p>每缸同轴环形换热器：热端加热器管束（80×φ4 U 形管）→ 中部回热器环（φ165/255×90）→ 冷端冷却器管束（1750×φ1×120）<br>
+     缸 i 热腔 → 本缸三器 → 缸 i+1 冷腔；4 缸共用曲轴，曲柄相位依次差 90°</p>
+</div>
+<div id="bar">
+  <button id="btnPlay" class="on">暂停</button>
+  <button id="btnSpin">自动旋转</button>
+  <button id="btnReset">复位视角</button>
+  <button id="btnLabels" class="on">标注</button>
+  <span class="hint">拖动旋转 · 滚轮缩放 · 右键拖动平移</span>
+</div>
+<div id="labels"></div>
+<div id="err">当前浏览器不支持 WebGL，无法显示三维视图。</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   1. 数学
+   ===================================================================== */
+const M4 = {
+  ident: () => new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]),
+  mul(a, b) {
+    const o = new Float32Array(16);
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+      let s = 0;
+      for (let k = 0; k < 4; k++) s += a[k * 4 + j] * b[i * 4 + k];
+      o[i * 4 + j] = s;
+    }
+    return o;
+  },
+  persp(fovy, asp, n, f) {
+    const t = 1 / Math.tan(fovy / 2), o = new Float32Array(16);
+    o[0] = t / asp; o[5] = t; o[10] = (f + n) / (n - f); o[11] = -1; o[14] = 2 * f * n / (n - f);
+    return o;
+  },
+  lookAt(eye, ctr, up) {
+    const z = norm(sub(eye, ctr)), x = norm(cross(up, z)), y = cross(z, x);
+    return new Float32Array([
+      x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0,
+      -dot(x, eye), -dot(y, eye), -dot(z, eye), 1]);
+  },
+  trs(t, R, s) {
+    const o = new Float32Array(16);
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) o[c * 4 + r] = R[r * 3 + c] * s[c];
+    o[12] = t[0]; o[13] = t[1]; o[14] = t[2]; o[15] = 1;
+    return o;
+  },
+  nrm3(m) {
+    const a = [m[0],m[1],m[2], m[4],m[5],m[6], m[8],m[9],m[10]];
+    const det = a[0]*(a[4]*a[8]-a[5]*a[7]) - a[1]*(a[3]*a[8]-a[5]*a[6]) + a[2]*(a[3]*a[7]-a[4]*a[6]);
+    const id = det ? 1/det : 0;
+    const v = [
+      (a[4]*a[8]-a[5]*a[7])*id, (a[2]*a[7]-a[1]*a[8])*id, (a[1]*a[5]-a[2]*a[4])*id,
+      (a[5]*a[6]-a[3]*a[8])*id, (a[0]*a[8]-a[2]*a[6])*id, (a[2]*a[3]-a[0]*a[5])*id,
+      (a[3]*a[7]-a[4]*a[6])*id, (a[1]*a[6]-a[0]*a[7])*id, (a[0]*a[4]-a[1]*a[3])*id];
+    return new Float32Array([v[0],v[3],v[6], v[1],v[4],v[7], v[2],v[5],v[8]]);
+  }
+};
+const I3 = [1,0,0, 0,1,0, 0,0,1];      // 3x3 单位旋转（注意不能用 I3）
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const norm=v=>{const n=Math.hypot(v[0],v[1],v[2])||1;return [v[0]/n,v[1]/n,v[2]/n];};
+function rotX(a){const c=Math.cos(a),s=Math.sin(a);return [1,0,0, 0,c,-s, 0,s,c];}
+function rotY(a){const c=Math.cos(a),s=Math.sin(a);return [c,0,s, 0,1,0, -s,0,c];}
+function rotZ(a){const c=Math.cos(a),s=Math.sin(a);return [c,-s,0, s,c,0, 0,0,1];}
+function rotAxis(ax, ang){
+  const [x,y,z]=norm(ax), c=Math.cos(ang), s=Math.sin(ang), t=1-c;
+  return [t*x*x+c, t*x*y-s*z, t*x*z+s*y,
+          t*x*y+s*z, t*y*y+c, t*y*z-s*x,
+          t*x*z-s*y, t*y*z+s*x, t*z*z+c];
+}
+function segMat(p0, p1, r){
+  const d = sub(p1, p0), len = Math.hypot(d[0],d[1],d[2]) || 1e-6;
+  const dir = [d[0]/len, d[1]/len, d[2]/len];
+  const ax = cross([0,1,0], dir), s = Math.hypot(ax[0],ax[1],ax[2]), c = dir[1];
+  const R = s < 1e-6 ? (c > 0 ? I3 : rotX(Math.PI)) : rotAxis(ax, Math.atan2(s, c));
+  return M4.trs(p0, R, [r, len, r]);
+}
+
+/* =====================================================================
+   2. 几何：立方体 / 圆柱 / 球 / 环形壳（可带切口）
+   ===================================================================== */
+function boxGeo(){
+  const p=[], n=[], i=[];
+  const faces=[[[1,0,0],[0,0,1],[0,1,0]],[[-1,0,0],[0,0,-1],[0,1,0]],
+               [[0,1,0],[0,0,-1],[1,0,0]],[[0,-1,0],[0,0,1],[1,0,0]],
+               [[0,0,1],[1,0,0],[0,1,0]],[[0,0,-1],[-1,0,0],[0,1,0]]];
+  faces.forEach(([nn,uu,vv])=>{
+    const base=p.length/3;
+    for(const [su,sv] of [[-1,-1],[1,-1],[1,1],[-1,1]]){
+      p.push(nn[0]*.5+uu[0]*su*.5+vv[0]*sv*.5,
+             nn[1]*.5+uu[1]*su*.5+vv[1]*sv*.5,
+             nn[2]*.5+uu[2]*su*.5+vv[2]*sv*.5);
+      n.push(...nn);
+    }
+    i.push(base,base+2,base+1, base,base+3,base+2);
+  });
+  return {pos:new Float32Array(p), nrm:new Float32Array(n), idx:new Uint16Array(i)};
+}
+function cylGeo(seg=20){
+  const p=[], n=[], i=[];
+  for(let k=0;k<seg;k++){
+    const a0=k/seg*Math.PI*2, a1=(k+1)/seg*Math.PI*2;
+    const c0=Math.cos(a0), s0=Math.sin(a0), c1=Math.cos(a1), s1=Math.sin(a1);
+    const b=p.length/3;
+    p.push(c0,0,s0, c1,0,s1, c1,1,s1, c0,1,s0);
+    n.push(c0,0,s0, c1,0,s1, c1,0,s1, c0,0,s0);
+    i.push(b,b+2,b+1, b,b+3,b+2);
+  }
+  for(const [y,dir] of [[0,-1],[1,1]]){
+    const base=p.length/3;
+    p.push(0,y,0); n.push(0,dir,0);
+    for(let k=0;k<=seg;k++){
+      const a=k/seg*Math.PI*2;
+      p.push(Math.cos(a), y, Math.sin(a)); n.push(0,dir,0);
+    }
+    for(let k=0;k<seg;k++){
+      if(dir < 0) i.push(base, base+1+k, base+2+k);
+      else        i.push(base, base+2+k, base+1+k);
+    }
+  }
+  return {pos:new Float32Array(p), nrm:new Float32Array(n), idx:new Uint16Array(i)};
+}
+function sphereGeo(seg=14, ring=9){
+  const p=[], n=[], i=[];
+  for(let r=0;r<=ring;r++){
+    const phi=r/ring*Math.PI;
+    for(let s=0;s<=seg;s++){
+      const th=s/seg*Math.PI*2;
+      const x=Math.sin(phi)*Math.cos(th), y=Math.cos(phi), z=Math.sin(phi)*Math.sin(th);
+      p.push(x,y,z); n.push(x,y,z);
+    }
+  }
+  for(let r=0;r<ring;r++)for(let s=0;s<seg;s++){
+    const a=r*(seg+1)+s, b=a+seg+1;
+    i.push(a,b+1,b, a,a+1,b+1);
+  }
+  return {pos:new Float32Array(p), nrm:new Float32Array(n), idx:new Uint16Array(i)};
+}
+/* 环形壳：外半径 1、内半径 fi、高 0..1，可只取 [a0,a1] 扇区（切开展示内部） */
+function shellGeo(a0, a1, fi, seg){
+  const p=[], n=[], i=[];
+  const ang = k => a0 + (a1-a0)*k/seg;
+  const N = seg + 1;
+  // 外壁
+  const o0 = p.length/3;
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(c,0,s);n.push(c,0,s);}
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(c,1,s);n.push(c,0,s);}
+  for(let k=0;k<seg;k++) i.push(o0+k, o0+N+k+1, o0+k+1, o0+k, o0+N+k, o0+N+k+1);
+  // 内壁
+  const i0 = p.length/3;
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(fi*c,0,fi*s);n.push(-c,0,-s);}
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(fi*c,1,fi*s);n.push(-c,0,-s);}
+  for(let k=0;k<seg;k++) i.push(i0+k, i0+k+1, i0+N+k+1, i0+k, i0+N+k+1, i0+N+k);
+  // 顶面
+  const t0 = p.length/3;
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(fi*c,1,fi*s);n.push(0,1,0);}
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(c,1,s);n.push(0,1,0);}
+  for(let k=0;k<seg;k++) i.push(t0+k, t0+N+k+1, t0+N+k, t0+k, t0+k+1, t0+N+k+1);
+  // 底面
+  const b0 = p.length/3;
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(fi*c,0,fi*s);n.push(0,-1,0);}
+  for(let k=0;k<N;k++){const a=ang(k),c=Math.cos(a),s=Math.sin(a);p.push(c,0,s);n.push(0,-1,0);}
+  for(let k=0;k<seg;k++) i.push(b0+k, b0+k+1, b0+N+k+1, b0+k, b0+N+k+1, b0+N+k);
+  // 两切割面
+  for(const [k, sg] of [[0,-1],[seg,1]]){
+    const a=ang(k), c=Math.cos(a), s=Math.sin(a);
+    const nx = sg*s, nz = -sg*c;
+    const base = p.length/3;
+    p.push(fi*c,0,fi*s, c,0,s, c,1,s, fi*c,1,fi*s);
+    for(let j=0;j<4;j++) n.push(nx,0,nz);
+    i.push(base, base+2, base+1, base, base+3, base+2);
+  }
+  return {pos:new Float32Array(p), nrm:new Float32Array(n), idx:new Uint16Array(i)};
+}
+
+/* =====================================================================
+   3. WebGL 初始化
+   ===================================================================== */
+const canvas = document.getElementById('gl');
+const gl = canvas.getContext('webgl', {antialias:true, alpha:false});
+if(!gl){ document.getElementById('err').style.display='grid'; throw new Error('no webgl'); }
+const VS = `
+attribute vec3 aPos; attribute vec3 aNrm;
+uniform mat4 uMVP; uniform mat4 uModel; uniform mat3 uNMat;
+varying vec3 vN; varying vec3 vP;
+void main(){
+  vec4 wp = uModel * vec4(aPos, 1.0);
+  vP = wp.xyz; vN = normalize(uNMat * aNrm);
+  gl_Position = uMVP * vec4(aPos, 1.0);
+}`;
+const FS = `
+precision mediump float;
+varying vec3 vN; varying vec3 vP;
+uniform vec3 uColor; uniform float uAlpha; uniform float uEmis; uniform vec3 uEye;
+void main(){
+  vec3 N = normalize(vN);
+  vec3 Ld = normalize(vec3(0.42, 0.86, 0.58));
+  vec3 Ld2 = normalize(vec3(-0.55, 0.25, -0.72));
+  vec3 V = normalize(uEye - vP);
+  vec3 Hv = normalize(Ld + V);
+  float dif = max(dot(N, Ld), 0.0);
+  float dif2 = max(dot(N, Ld2), 0.0);
+  float spc = pow(max(dot(N, Hv), 0.0), 40.0);
+  vec3 c = uColor * (0.70 + 0.45 * dif + 0.12 * dif2) + vec3(1.0) * spc * 0.22;
+  c = mix(c, uColor * 1.12, uEmis);
+  gl_FragColor = vec4(c, uAlpha);
+}`;
+function sh(t, src){
+  const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
+  if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+const prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+gl.linkProgram(prog);
+if(!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+const A = {pos: gl.getAttribLocation(prog,'aPos'), nrm: gl.getAttribLocation(prog,'aNrm')};
+const U = {};
+['uMVP','uModel','uNMat','uColor','uAlpha','uEmis','uEye'].forEach(k=>U[k]=gl.getUniformLocation(prog,k));
+function upload(geo){
+  const o = {pos:gl.createBuffer(), nrm:gl.createBuffer(), idx:gl.createBuffer(), n:geo.idx.length};
+  gl.bindBuffer(gl.ARRAY_BUFFER, o.pos); gl.bufferData(gl.ARRAY_BUFFER, geo.pos, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, o.nrm); gl.bufferData(gl.ARRAY_BUFFER, geo.nrm, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geo.idx, gl.STATIC_DRAW);
+  return o;
+}
+const D2R = Math.PI/180;
+const CUT0 = 62*D2R, CUT1 = 168*D2R;        // 切开展示的扇区（朝默认视角）
+const G = {
+  box:  upload(boxGeo()),
+  cyl:  upload(cylGeo(20)),
+  cyl8: upload(cylGeo(8)),
+  sph:  upload(sphereGeo()),
+  shell: upload(shellGeo(CUT0, CUT1, 0.93, 26)),      // 薄壁壳（缸套/外壳）
+  shellT: upload(shellGeo(CUT0, CUT1, 0.62, 26)),     // 厚壁壳（回热器环）
+  shellF: upload(shellGeo(0, Math.PI*2, 0.93, 26))    // 完整薄壁壳（无切口，用于不被遮挡处）
+};
+gl.enable(gl.DEPTH_TEST);
+gl.enable(gl.CULL_FACE);
+gl.clearColor(0.933, 0.953, 0.969, 1);
+
+/* =====================================================================
+   4. 结构参数（mm，取自模型/侯斌 2018 表 6-7）
+   ===================================================================== */
+const BORE = 80;            // 缸孔半径 φ160
+const LINER_T = 6;          // 缸套壁厚
+const R = 25, L = 200;      // 曲柄半径 / 连杆长
+const PIST_H = 60;          // 活塞高
+const LIN0 = 100, LIN1 = 350;   // 缸套上下端
+const COOL0 = 118, COOL1 = 238; // 冷却器（120 高）
+const REG0 = 250, REG1 = 340;   // 回热器（90 高）
+const HEAD0 = 350, HEAD1 = 372; // 缸盖
+const HEAT0 = 372, HEAT1 = 622; // 加热器 U 管（腿长 250，管总长 500）
+const REG_RI = 82.5, REG_RO = 127.5;   // 回热器环 φ165/255
+const SP = 400;                        // 缸间距
+const CX = [-1.5*SP, -0.5*SP, 0.5*SP, 1.5*SP];
+const PHI = [0, Math.PI/2, Math.PI, 3*Math.PI/2];
+const PERIOD = 2.4;                    // 一转 2.4 s（约 60 倍慢放）
+
+const C = {
+  steel:[0.52,0.57,0.62], steelD:[0.30,0.35,0.40], liner:[0.66,0.71,0.76],
+  hot:[0.90,0.35,0.16], cold:[0.14,0.52,0.80], reg:[0.50,0.38,0.68],
+  na:[0.93,0.44,0.13], water:[0.15,0.55,0.82], duct:[0.62,0.68,0.73],
+  fly:[0.74,0.78,0.82], gasHot:[0.96,0.47,0.24], gasCold:[0.32,0.68,0.93],
+  base:[0.60,0.66,0.71]
+};
+function wristY(th){ return R*Math.cos(th) + Math.sqrt(L*L - (R*Math.sin(th))**2); }
+
+/* =====================================================================
+   5. 网格表与构建
+   ===================================================================== */
+const meshes = [];
+const dyn = {pist:[], ring:[], rod:[], crk:[], pin:[], cw:[], hot:[], cold:[], reg:[], spoke:[], part:[]};
+function add(geo, mat, col, opt){
+  const o = {geo, mat, col, alpha:(opt&&opt.alpha)!=null?opt.alpha:1,
+             emis:(opt&&opt.emis)||0, tag:(opt&&opt.tag)||''};
+  meshes.push(o); return o;
+}
+function addSeg(geo, p0, p1, r, col, opt){ return add(geo, segMat(p0,p1,r), col, opt); }
+function ringPt(r, a, y){ return [r*Math.cos(a), y, r*Math.sin(a)]; }
+
+/* ---- 单缸：缸套、缸盖、同轴三换热器、管束 ---- */
+function buildCylinder(k){
+  const cx = CX[k];
+  // 缸套（带切口）
+  add(G.shell, M4.trs([cx, LIN0, 0], I3, [BORE+LINER_T, LIN1-LIN0, BORE+LINER_T]),
+      C.liner, {tag:'liner'+k});
+  // 缸盖
+  add(G.cyl, M4.trs([cx, HEAD0, 0], I3, [BORE+LINER_T+6, HEAD1-HEAD0, BORE+LINER_T+6]),
+      C.steelD);
+  // 回热器环（厚壁壳 + 径向肋表示丝网基体）
+  add(G.shellT, M4.trs([cx, REG0, 0], I3, [REG_RO, REG1-REG0, REG_RO]), C.reg, {tag:'reg'+k});
+  for(let i=0;i<20;i++){
+    const a = CUT0 + (CUT1-CUT0)*i/19;
+    const p0 = ringPt(REG_RI+2, a, REG0+6), p1 = ringPt(REG_RO-2, a, REG0+6);
+    addSeg(G.box, p0, p1, 0.5, C.reg, {tag:'rib'+k});
+  }
+  // 加热器：32 根 U 形管（每根两腿，管长 500 → 腿长 250）
+  const NA = 32, RH = 112, dA = 0.055;
+  for(let i=0;i<NA;i++){
+    const a = i*Math.PI*2/NA;
+    const a1 = a - dA, a2 = a + dA;
+    const p1 = ringPt(RH, a1, HEAT0), q1 = ringPt(RH, a1, HEAT1);
+    const p2 = ringPt(RH, a2, HEAT0), q2 = ringPt(RH, a2, HEAT1);
+    addSeg(G.cyl8, [p1[0]+cx, p1[1], p1[2]], [q1[0]+cx, q1[1], q1[2]], 2.1, C.hot, {tag:'hx'+k});
+    addSeg(G.cyl8, [p2[0]+cx, p2[1], p2[2]], [q2[0]+cx, q2[1], q2[2]], 2.1, C.hot, {tag:'hx'+k});
+    addSeg(G.cyl8, [q1[0]+cx, q1[1], q1[2]], [q2[0]+cx, q2[1], q2[2]], 2.1, C.hot, {tag:'hx'+k});
+  }
+  // 加热器外壳（钠侧），带切口
+  add(G.shell, M4.trs([cx, HEAT0-14, 0], I3, [RH+40, HEAT1-HEAT0+34, RH+40]), C.na, {tag:'naShell'+k, alpha:0.30});
+  // 冷却器：48 根 φ1 管（代表 1750 根密排束），两圈
+  const NC = 24;
+  for(let ring=0; ring<2; ring++){
+    const rc = 96 + ring*26;
+    for(let i=0;i<NC;i++){
+      const a = i*Math.PI*2/NC + ring*0.13;
+      const p0 = ringPt(rc, a, COOL0+4), p1 = ringPt(rc, a, COOL1-4);
+      addSeg(G.cyl8, [p0[0]+cx, p0[1], p0[2]], [p1[0]+cx, p1[1], p1[2]], 1.6, C.cold, {tag:'cx'+k});
+    }
+  }
+  // 冷却器外壳（水侧），带切口
+  add(G.shell, M4.trs([cx, COOL0-12, 0], I3, [134, COOL1-COOL0+26, 134]), C.water, {tag:'wShell'+k, alpha:0.30});
+  // 缸体支架（下端法兰 + 立柱）
+  add(G.cyl, M4.trs([cx, LIN0-16, 0], I3, [BORE+LINER_T+14, 16, BORE+LINER_T+14]), C.steelD);
+}
+
+/* ---- 曲轴 / 连杆 / 飞轮 / 机座 ---- */
+function buildCrank(){
+  // 主轴
+  addSeg(G.cyl, [CX[0]-260, 0, 0], [CX[3]+420, 0, 0], 34, C.steel, {tag:'shaft'});
+  // 主轴承座
+  for(const cx of CX){
+    add(G.cyl, M4.trs([cx-190, -60, 0], I3, [58, 120, 58]), C.steelD);
+  }
+  // 飞轮（轮盘 + 轮毂 + 辐条）
+  const FX = CX[3] + 420;
+  add(G.cyl, M4.trs([FX, -34, 0], rotX(Math.PI/2), [300, 68, 300]), C.fly, {tag:'fly'});
+  add(G.cyl, M4.trs([FX, -60, 0], rotX(Math.PI/2), [80, 120, 80]), C.steelD, {tag:'hub'});
+  for(let i=0;i<4;i++){
+    dyn.spoke.push(add(G.box, M4.ident(), C.steelD, {tag:'spoke'+i}));
+    dyn.spoke.push(add(G.box, M4.ident(), C.steelD, {tag:'spoke'+i+'b'}));
+  }
+  // 机座
+  add(G.box, M4.trs([0, -150, 0], I3, [CX[3]-CX[0]+1100, 30, 560]), C.base);
+  // 曲轴箱：只留后侧板与端板，正面敞开以便看到曲柄连杆
+  add(G.box, M4.trs([0, -30, 240], I3, [CX[3]-CX[0]+900, 260, 14]), C.steelD);
+  for(const x of [CX[0]-450, CX[3]+450]){
+    add(G.box, M4.trs([x, -30, 0], I3, [14, 260, 480]), C.steelD);
+  }
+}
+
+/* ---- 集管与跨缸气路 ---- */
+function buildPipes(){
+  const X0 = CX[0]-230, X1 = CX[3]+240;
+  // 钠：上进下出（逆流）
+  addSeg(G.cyl, [X0, HEAT1+50, 200], [X1, HEAT1+50, 200], 26, C.na, {tag:'naIn'});
+  addSeg(G.cyl, [X0, HEAT0-40, 200], [X1, HEAT0-40, 200], 26, C.na, {tag:'naOut'});
+  // 水：下进上出
+  addSeg(G.cyl, [X0, COOL0-70, 200], [X1, COOL0-70, 200], 20, C.water, {tag:'wIn'});
+  addSeg(G.cyl, [X0, COOL1+50, 200], [X1, COOL1+50, 200], 20, C.water, {tag:'wOut'});
+  for(let k=0;k<4;k++){
+    const cx = CX[k];
+    // 钠支管（集管 → 加热器壳）
+    addSeg(G.cyl, [cx, HEAT1+50, 200], [cx, HEAT1+40, 200], 16, C.na);
+    addSeg(G.cyl, [cx, HEAT1+40, 200], [cx, HEAT1-6, 148], 16, C.na);
+    addSeg(G.cyl, [cx, HEAT0-40, 200], [cx, HEAT0-40, 150], 16, C.na);
+    addSeg(G.cyl, [cx, HEAT0-40, 150], [cx, HEAT0-6, 150], 16, C.na);
+    // 水支管
+    addSeg(G.cyl, [cx, COOL0-70, 200], [cx, COOL0-70, 150], 13, C.water);
+    addSeg(G.cyl, [cx, COOL0-70, 150], [cx, COOL0+6, 150], 13, C.water);
+    addSeg(G.cyl, [cx, COOL1+50, 200], [cx, COOL1+50, 150], 13, C.water);
+    addSeg(G.cyl, [cx, COOL1+50, 150], [cx, COOL1-6, 150], 13, C.water);
+    // 跨缸气路：本缸冷却器出口 → 下一缸冷腔（走机后）
+    const nxt = k<3 ? CX[k+1] : CX[0];
+    const zz = k<3 ? -150 : -260;
+    addSeg(G.cyl, [cx, COOL0+30, -134], [cx, COOL0+30, zz], 14, C.duct);
+    addSeg(G.cyl, [cx, COOL0+30, zz], [nxt, COOL0+30, zz], 14, C.duct);
+    addSeg(G.cyl, [nxt, COOL0+30, zz], [nxt, COOL0+30, -134], 14, C.duct);
+    addSeg(G.cyl, [nxt, COOL0+30, -134], [nxt, LIN0+70, -86], 14, C.duct);
+  }
+}
+
+/* ---- 动态件 ---- */
+function buildDynamic(){
+  for(let k=0;k<4;k++){
+    dyn.pist.push(add(G.cyl, M4.ident(), [0.88,0.91,0.94], {tag:'pist'+k}));
+    dyn.ring.push(add(G.cyl, M4.ident(), C.steelD, {tag:'pring'+k}));
+    dyn.hot.push(add(G.cyl, M4.ident(), C.gasHot, {tag:'hot'+k}));
+    dyn.cold.push(add(G.cyl, M4.ident(), C.gasCold, {tag:'cold'+k}));
+    dyn.rod.push(add(G.cyl, M4.ident(), C.steelD, {tag:'rod'+k}));
+    dyn.crk.push(add(G.box, M4.ident(), C.steel, {tag:'crk'+k}));
+    dyn.pin.push(add(G.cyl, M4.ident(), C.steelD, {tag:'pin'+k}));
+    dyn.cw.push(add(G.box, M4.ident(), C.steelD, {tag:'cw'+k}));
+    dyn.reg.push(add(G.shellT, M4.trs([CX[k], REG0, 0], I3,
+        [REG_RO+3, REG1-REG0, REG_RO+3]), C.reg, {alpha:0.35, emis:0.6, tag:'glow'+k}));
+    for(let i=0;i<10;i++)
+      dyn.part.push({mesh: add(G.sph, M4.ident(), [0.98,0.98,0.98], {tag:'flow'+k+'_'+i}), k, i});
+  }
+}
+
+/* ---- 气路折线（粒子用）---- */
+function gasPath(k){
+  const cx = CX[k], nxt = k<3 ? CX[k+1] : CX[0];
+  const zz = k<3 ? -150 : -260;
+  const rh = 112, a = 0, a2 = 0.055;
+  const P = [
+    [cx, 300, 0],
+    [cx, HEAD1, 0],
+    [cx + rh*Math.cos(a-a2), HEAD1, rh*Math.sin(a-a2)],
+    [cx + rh*Math.cos(a-a2), HEAT1-14, rh*Math.sin(a-a2)],
+    [cx + rh*Math.cos(a), HEAT1, rh*Math.sin(a)],
+    [cx + rh*Math.cos(a+a2), HEAT1-14, rh*Math.sin(a+a2)],
+    [cx + rh*Math.cos(a+a2), HEAD1, rh*Math.sin(a+a2)],
+    [cx + 100*Math.cos(a+a2), REG1-4, 100*Math.sin(a+a2)],
+    [cx + 100*Math.cos(a+a2), REG0+4, 100*Math.sin(a+a2)],
+    [cx + 100*Math.cos(a+a2), COOL1-4, 100*Math.sin(a+a2)],
+    [cx + 100*Math.cos(a+a2), COOL0+30, 100*Math.sin(a+a2)],
+    [cx, COOL0+30, -134],
+    [cx, COOL0+30, zz],
+    [nxt, COOL0+30, zz],
+    [nxt, COOL0+30, -134],
+    [nxt, LIN0+90, -70],
+    [nxt, 150, 0]
+  ];
+  return P;
+}
+function pathLen(P){
+  let s = 0;
+  for(let i=1;i<P.length;i++) s += Math.hypot(P[i][0]-P[i-1][0], P[i][1]-P[i-1][1], P[i][2]-P[i-1][2]);
+  return s;
+}
+function pointAt(P, u){
+  const tot = pathLen(P); let d = u*tot;
+  for(let i=1;i<P.length;i++){
+    const a=P[i-1], b=P[i];
+    const seg = Math.hypot(b[0]-a[0], b[1]-a[1], b[2]-a[2]);
+    if(d <= seg){ const t = seg ? d/seg : 0;
+      return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
+    d -= seg;
+  }
+  return P[P.length-1];
+}
+
+/* =====================================================================
+   6. 相机 / 交互
+   ===================================================================== */
+const cam = {yaw:-0.62, pitch:0.22, dist:2150, target:[0, 285, 0], fov:0.72};
+const DEF = JSON.parse(JSON.stringify(cam));
+let dragging=false, dragBtn=0, lastX=0, lastY=0;
+canvas.addEventListener('pointerdown', e=>{dragging=true;dragBtn=e.button;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointerup', ()=>{dragging=false;});
+canvas.addEventListener('pointermove', e=>{
+  if(!dragging) return;
+  const dx=e.clientX-lastX, dy=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY;
+  if(dragBtn===2){
+    const s=cam.dist*0.0016;
+    cam.target[0] -= (dx*Math.cos(cam.yaw)-dy*Math.sin(cam.yaw))*s;
+    cam.target[1] += dy*s;
+    cam.target[2] += (dx*Math.sin(cam.yaw)+dy*Math.cos(cam.yaw))*s;
+  } else {
+    cam.yaw -= dx*0.008;
+    cam.pitch = Math.max(-1.35, Math.min(1.45, cam.pitch + dy*0.006));
+  }
+});
+canvas.addEventListener('contextmenu', e=>e.preventDefault());
+canvas.addEventListener('wheel', e=>{
+  e.preventDefault();
+  cam.dist = Math.max(900, Math.min(9000, cam.dist*(1+Math.sign(e.deltaY)*0.09)));
+}, {passive:false});
+function camEye(){
+  const cp=Math.cos(cam.pitch), sp=Math.sin(cam.pitch);
+  return [cam.target[0]+cam.dist*cp*Math.sin(cam.yaw), cam.target[1]+cam.dist*sp,
+          cam.target[2]+cam.dist*cp*Math.cos(cam.yaw)];
+}
+
+/* =====================================================================
+   7. 标注
+   ===================================================================== */
+const labelBox = document.getElementById('labels');
+const LABELS = [
+  {p:[CX[0], 660, 0], t:'缸1', c:'k'}, {p:[CX[1], 660, 0], t:'缸2', c:'k'},
+  {p:[CX[2], 660, 0], t:'缸3', c:'k'}, {p:[CX[3], 660, 0], t:'缸4', c:'k'},
+  {p:[CX[0], 310, 0], t:'热腔', c:'hot'}, {p:[CX[0], 150, 0], t:'冷腔', c:'cold'},
+  {p:[CX[0]+150, 500, 0], t:'加热器 80×φ4×500', c:'hot'},
+  {p:[CX[0]+160, 295, 0], t:'回热器 φ165/255×90', c:'reg'},
+  {p:[CX[0]+165, 178, 0], t:'冷却器 1750×φ1×120', c:'cold'},
+  {p:[CX[0]-330, 672, 200], t:'钠集管 530 → 430 ℃ · Q_in ≈ 1.003 MW', c:'na'},
+  {p:[CX[0]-330, 42, 200], t:'冷却水集管 38 ℃ · Q_out ≈ 0.758 MW', c:'w'},
+  {p:[CX[3]+420, 260, 0], t:'飞轮 · 输出 P ≈ 245 kW / 组', c:'k'},
+  {p:[0, 130, -260], t:'回路④：缸4 冷却器 → 缸1 冷腔（跨缸长回路）', c:'sm'}
+];
+LABELS.forEach(L=>{
+  const d=document.createElement('div'); d.className='lab '+L.c; d.textContent=L.t;
+  labelBox.appendChild(d); L.el=d;
+});
+
+/* =====================================================================
+   8. 每帧更新
+   ===================================================================== */
+let phase=0, playing=true, autoSpin=false, showLabels=true, lastT=performance.now();
+function updateScene(dt){
+  if(playing) phase = (phase + dt/PERIOD) % 1;
+  const th0 = phase*Math.PI*2, I = I3;
+  for(let k=0;k<4;k++){
+    const th = th0 + PHI[k], cx = CX[k];
+    const wy = wristY(th);
+    const px = cx + R*Math.sin(th), py = -R*Math.cos(th);
+    const pt = wy + PIST_H;                       // 活塞顶
+    dyn.pist[k].mat = M4.trs([cx, wy, 0], I, [BORE-3, PIST_H, BORE-3]);
+    dyn.ring[k].mat = M4.trs([cx, wy+PIST_H-12, 0], I, [BORE-1, 8, BORE-1]);
+    dyn.hot[k].mat  = M4.trs([cx, pt, 0], I, [BORE-6, Math.max(2, HEAD0-pt), BORE-6]);
+    dyn.cold[k].mat = M4.trs([cx, LIN0+6, 0], I, [BORE-6, Math.max(2, wy-(LIN0+6)), BORE-6]);
+    dyn.rod[k].mat  = segMat([cx, wy, 0], [px, py, 0], 12);
+    dyn.crk[k].mat  = M4.trs([(cx+px)/2, py/2, 0], rotZ(th), [Math.hypot(px-cx,py), 46, 46]);
+    dyn.pin[k].mat  = segMat([px, py, -34], [px, py, 34], 15);
+    dyn.cw[k].mat   = M4.trs([cx - R*Math.sin(th)*0.9, -R*Math.cos(th)*0.9, 0], rotZ(th), [64, 40, 40]);
+    dyn.reg[k].emis = 0.12 + 0.7*Math.abs(Math.sin(th));
+    const P = gasPath(k), dir = Math.sin(th) >= 0 ? 1 : -1;
+    const base = (playing ? phase*0.6 : 0)*dir;
+    for(const Q of dyn.part){
+      if(Q.k !== k) continue;
+      let u = (Q.i/10 + base) % 1; if(u<0) u += 1;
+      Q.mesh.mat = M4.trs(pointAt(P, u), I, [6,6,6]);
+    }
+  }
+  for(let i=0;i<4;i++){
+    const a = i*Math.PI/2, Rm = rotZ(th0 + a);
+    dyn.spoke[2*i].mat   = M4.trs([CX[3]+420, 0, 40], Rm, [520, 16, 10]);
+    dyn.spoke[2*i+1].mat = M4.trs([CX[3]+420, 0, -40], Rm, [520, 16, 10]);
+  }
+}
+function draw(){
+  const W=canvas.width, H=canvas.height;
+  gl.viewport(0,0,W,H);
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  const eye = camEye();
+  const proj = M4.persp(cam.fov, W/H, 260, 9000);
+  const view = M4.lookAt(eye, cam.target, [0,1,0]);
+  const VP = M4.mul(proj, view);
+  gl.uniform3fv(U.uEye, new Float32Array(eye));
+  const opaque=[], trans=[];
+  for(const m of meshes){
+    if(!m.mat) continue;
+    if(DBG.hide.some(h=>m.tag.indexOf(h)===0)) continue;
+    if(DBG.only && m.tag.indexOf(DBG.only)!==0) continue;
+    if(DBG.untagged && m.tag!=='') continue;
+    (m.alpha>=1?opaque:trans).push(m);
+  }
+  trans.forEach(m=>{m._d=Math.hypot(m.mat[12]-eye[0], m.mat[13]-eye[1], m.mat[14]-eye[2]);});
+  trans.sort((a,b)=>b._d-a._d);
+  const bind = g=>{
+    gl.bindBuffer(gl.ARRAY_BUFFER, g.pos); gl.enableVertexAttribArray(A.pos);
+    gl.vertexAttribPointer(A.pos,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, g.nrm); gl.enableVertexAttribArray(A.nrm);
+    gl.vertexAttribPointer(A.nrm,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.idx);
+  };
+  const one = m=>{
+    bind(m.geo);
+    gl.uniformMatrix4fv(U.uModel,false,m.mat);
+    gl.uniformMatrix3fv(U.uNMat,false,M4.nrm3(m.mat));
+    gl.uniformMatrix4fv(U.uMVP,false,M4.mul(VP,m.mat));
+    gl.uniform3fv(U.uColor,new Float32Array(m.col));
+    gl.uniform1f(U.uAlpha,m.alpha);
+    gl.uniform1f(U.uEmis,m.emis);
+    gl.drawElements(gl.TRIANGLES,m.geo.n,gl.UNSIGNED_SHORT,0);
+  };
+  gl.disable(gl.BLEND); gl.depthMask(true);
+  if(DBG.cull) gl.enable(gl.CULL_FACE); else gl.disable(gl.CULL_FACE);
+  opaque.forEach(one);
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+  trans.forEach(one);
+  gl.depthMask(true); gl.disable(gl.BLEND);
+  if(showLabels){
+    for(const L of LABELS){
+      const p=L.p;
+      const x=VP[0]*p[0]+VP[4]*p[1]+VP[8]*p[2]+VP[12];
+      const y=VP[1]*p[0]+VP[5]*p[1]+VP[9]*p[2]+VP[13];
+      const w=VP[3]*p[0]+VP[7]*p[1]+VP[11]*p[2]+VP[15];
+      if(w<=1){L.el.style.display='none';continue;}
+      L.el.style.display='block';
+      L.el.style.transform=`translate(-50%,-50%) translate(${(x/w*0.5+0.5)*W}px, ${(1-(y/w*0.5+0.5))*H}px)`;
+    }
+  } else LABELS.forEach(L=>L.el.style.display='none');
+}
+
+/* =====================================================================
+   9. 主循环 / UI
+   ===================================================================== */
+function resize(){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.round(innerWidth*dpr);
+  canvas.height=Math.round(innerHeight*dpr);
+}
+addEventListener('resize', resize);
+const btnPlay=document.getElementById('btnPlay'), btnSpin=document.getElementById('btnSpin');
+const btnReset=document.getElementById('btnReset'), btnLabels=document.getElementById('btnLabels');
+btnPlay.onclick=()=>{playing=!playing;btnPlay.textContent=playing?'暂停':'播放';btnPlay.classList.toggle('on',playing);};
+btnSpin.onclick=()=>{autoSpin=!autoSpin;btnSpin.classList.toggle('on',autoSpin);};
+btnReset.onclick=()=>{Object.assign(cam,JSON.parse(JSON.stringify(DEF)));};
+btnLabels.onclick=()=>{showLabels=!showLabels;btnLabels.classList.toggle('on',showLabels);};
+
+/* 无头截图验证用：?yaw=&pitch=&dist=&tx=&ty=&tz=&t=&labels=0&hide=&only=&untagged=1&cull=0 */
+const q = new URLSearchParams(location.search);
+const DBG = {hide:(q.get('hide')||'').split(',').filter(Boolean), cull:q.get('cull')!=='0',
+             only:q.get('only')||'', untagged:q.get('untagged')==='1'};
+if(q.has('yaw')) cam.yaw=parseFloat(q.get('yaw'));
+if(q.has('pitch')) cam.pitch=parseFloat(q.get('pitch'));
+if(q.has('dist')) cam.dist=parseFloat(q.get('dist'));
+if(q.has('tx')) cam.target[0]=parseFloat(q.get('tx'));
+if(q.has('ty')) cam.target[1]=parseFloat(q.get('ty'));
+if(q.has('tz')) cam.target[2]=parseFloat(q.get('tz'));
+if(q.has('labels')) showLabels=q.get('labels')!=='0';
+if(q.has('t')){phase=parseFloat(q.get('t'));playing=false;
+               btnPlay.textContent='播放';btnPlay.classList.remove('on');}
+
+function frame(now){
+  const dt=Math.min((now-lastT)/1000,0.05); lastT=now;
+  if(autoSpin && !dragging) cam.yaw += dt*0.25;
+  updateScene(dt); draw();
+  requestAnimationFrame(frame);
+}
+resize();
+buildCrank();
+buildPipes();
+for(let k=0;k<4;k++) buildCylinder(k);
+buildDynamic();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
