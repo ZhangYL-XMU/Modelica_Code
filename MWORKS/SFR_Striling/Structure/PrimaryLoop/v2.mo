@@ -15,7 +15,7 @@ grid={2,2})), experiment(Algorithm = Dassl, InlineIntegrator = false, InlineStep
     annotation(Placement(transformation(origin = {4.99444, -106.991},
     extent = {{-10, -10}, {10, 10}},
     rotation = 90)));
-  Nuclear.PointKinetics pointKinetics(Teffref_fuel = 885.5 "燃料参考=额定全10节点平均壁温K(2026-09-08 重标: 实测额定平均值885.50K; 原863.2为09-06旧模型状态残留)", Teffref_coolant(displayUnit = "degC") = 768.29 "冷却剂参考(2026-09-06 标定; 原768.15为旧口径)参考=额定堆芯平均温度(440+550)/2=495℃=768.15K(尹凯论文口径); 初始冷却剂反馈=0, 功率不跌落") 
+  Nuclear.PointKinetics pointKinetics(Teffref_fuel = 885.5 "燃料参考=额定全10节点平均壁温K(2026-09-08 重标: 实测额定平均值885.50K; 原863.2为09-06旧模型状态残留)", Teffref_coolant(displayUnit = "K") = 768.28511 "冷却剂参考(2026-09-12 标定: 768.29 -> 768.28511, 由 rho=0 一阶平衡解求得, 使稳态功率精确落于 40.000000 MW; 原768.15为尹凯论文口径)") 
     annotation(Placement(transformation(origin = {-160, 72},
     extent = {{-18, -20.5}, {18, 20.5}})));
   Modelica.Blocks.Sources.Constant constCR(k = 0) "无PID：控制棒反应性恒为0（自稳验证）" 
@@ -60,7 +60,7 @@ rotation=90)));
     annotation(Placement(transformation(origin = {-81.0056, -10.991},
     extent = {{-10, -10}, {10, 10}},
     rotation = 90)));
-  Fluid.Pipes.pipe innerCore(redeclare package Medium = SFR_Striling.Media.Sodium.ConstantPropertyLiquidSodium, N = 11, n_pipe = 37, L_total = 1.1, L_heat = 1.1, Dh = 0.0415, height_ab = -1.1, initFromEnthalpy = true, h_start = 607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer = true, momentumDynamics = Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start = 1.695 "单管62.7/37", redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.core) 
+  Fluid.Pipes.pipe innerCore(redeclare package Medium = SFR_Striling.Media.Sodium.ConstantPropertyLiquidSodium, N = 11, n_pipe = 37, L_total = 1.1, L_heat = 1.1, Dh = 0.0415, height_ab = -1.1, initFromEnthalpy = true, h_start = 607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer = true, momentumDynamics = Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start = 1.695 "单管62.7/37", CF_HeatTransfer = 1.0 "堆芯传热修正系数(2026-09-12 标定: 保持1.0; 功率标定由 Teffref_coolant 承担, 壁温 885.51K 不变)", redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.core) 
     annotation(Placement(transformation(origin = {-81.0056, 13.009},
     extent = {{-10, -10}, {10, 10}},
     rotation = 90)));
@@ -72,7 +72,7 @@ rotation=90)));
     annotation(Placement(transformation(origin = {4.99444, -10.991},
     extent = {{-10, -10}, {10, 10}},
     rotation = 90)));
-  Fluid.Pipes.pipe outerCore(redeclare package Medium = SFR_Striling.Media.Sodium.ConstantPropertyLiquidSodium, N = 11, n_pipe = 114, L_total = 1.1, L_heat = 1.1, Dh = 0.0415, height_ab = -1.1, initFromEnthalpy = true, h_start = 607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer = true, momentumDynamics = Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start = 1.907 "单管217.4/114", redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.core) 
+  Fluid.Pipes.pipe outerCore(redeclare package Medium = SFR_Striling.Media.Sodium.ConstantPropertyLiquidSodium, N = 11, n_pipe = 114, L_total = 1.1, L_heat = 1.1, Dh = 0.0415, height_ab = -1.1, initFromEnthalpy = true, h_start = 607863 "无PID自稳试验: 中芯初值=额定767.18K; h=cp*(T-298.15)", wallHeatTransfer = true, momentumDynamics = Modelica.Fluid.Types.Dynamics.DynamicFreeInitial, m_flow_start = 1.907 "单管217.4/114", CF_HeatTransfer = 1.0 "堆芯传热修正系数(2026-09-12 标定: 保持1.0; 功率标定由 Teffref_coolant 承担, 壁温 885.51K 不变)", redeclare model HeatTransfer = Fluid.Pipes.BaseClasses.HeatTransfer.core) 
     annotation(Placement(transformation(origin = {4.99444, 13.009},
     extent = {{-10, -10}, {10, 10}},
     rotation = 90)));
