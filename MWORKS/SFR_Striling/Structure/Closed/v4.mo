@@ -99,70 +99,70 @@ extent={{10,-10},{-10,10}})));
     annotation(Placement(transformation(origin={-21.2588,90.2446},
 extent={{-10,-10},{10,10}})));
   Fluid.Vessels.MixingVolume volumeTube(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, nPorts_a=1, nPorts_b=1, V=1, h_start=654480 "HE1出口530℃(设计剖面初值)") 
-    annotation(Placement(transformation(origin={153.5,-28.7244},
+    annotation(Placement(transformation(origin={192,-24},
 extent={{-10,-10},{10,10}})));
   Fluid.Vessels.ExpansionTank expansionTank1(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, A=1, V0=0.001, level_start=1, h_start=506655, p_start=100000.0) 
-    annotation(Placement(transformation(origin={254.259,97.2756},
+    annotation(Placement(transformation(origin={292.759,102},
 extent={{-10,-10},{10,10}})));
   Fluid.Vessels.SpecifiedResistance resistance_toExpTank(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, R=0.1) 
-    annotation(Placement(transformation(origin={254.259,63.2756},
+    annotation(Placement(transformation(origin={292.759,68},
 extent={{10,-10},{-10,10}},
 rotation=-90)));
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, use_input=false) 
-    annotation (Placement(transformation(origin={149.5,43.2756},
+    annotation (Placement(transformation(origin={188,48},
 extent={{10,-10},{-10,10}})));
-  Modelica.Mechanics.Rotational.Components.Damper damper(d=9.9936) annotation(Placement(transformation(origin={85,-221.833},
+  Modelica.Mechanics.Rotational.Components.Damper damper(d=10.443) annotation(Placement(transformation(origin={123.5,-217.109},
 extent={{10,-10},{-10,10}})));
-  Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={67,-245.833},
+  Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={105.5,-241.109},
 extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Inertia inertia(J=2, phi(start=0, fixed=true), w(start=100, fixed=true)) 
-    annotation(Placement(transformation(origin={125,-221.833},
+    annotation(Placement(transformation(origin={163.5,-217.109},
 extent={{-10,-10},{10,10}})));
   inner Modelica.Mechanics.MultiBody.World world 
-    annotation(Placement(transformation(origin={106,-116.433},
+    annotation(Placement(transformation(origin={144.5,-111.709},
 extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
-        displayUnit="1") = {1,0,0}) annotation(Placement(transformation(origin={145,-157.033},
+        displayUnit="1") = {1,0,0}) annotation(Placement(transformation(origin={183.5,-152.309},
 extent={{10,10},{-10,-10}})));
-  SFR_Striling.Stirling.DoubleActing.DA_Engine_v3 Engine(U_h=2.0e4, U_c=4.5e5, U_reg=2.0e6, heff_Na=1.4862, heff_water=1.0) 
-    annotation (Placement(transformation(origin={226.75,-133.773},
+  SFR_Striling.Stirling.DoubleActing.DA_Engine_v3 Engine(U_h=2.0e4, U_c=4.5e5, U_reg=2.0e6, heff_Na=1.5140, heff_water=1.0) 
+    annotation (Placement(transformation(origin={265.25,-129.049},
 extent={{-30.75,-28.9},{30.75,28.9}})));
   Fluid.Pipes.pipe Engine_pipe(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, N=5, L_total=0.5, m_flow_start=100, n_pipe=3200, Dh=0.004, CF_HeatTransfer=6, initFromEnthalpy=false, T_start=803.15, T_wall_start=803.15) 
-    annotation (Placement(transformation(origin={219.5,-28.7424},
+    annotation (Placement(transformation(origin={258,-24.018},
 extent={{-10,10},{10,-10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow[4] 
-    annotation (Placement(transformation(origin={219.5,-55.6514},
+    annotation (Placement(transformation(origin={258,-50.927},
 extent={{-10,-10},{10,10}},
 rotation=90)));
   Modelica.Blocks.Sources.RealExpression realExpression2(y=(Engine_pipe.T[1]+Engine_pipe.T[2]+Engine_pipe.T[3]+Engine_pipe.T[4]) / 4) 
-    annotation (Placement(transformation(origin={167.5,-83.3534},
+    annotation (Placement(transformation(origin={206,-78.629},
 extent={{-10,-10},{10,10}})));
   Fluid.Pipes.pipe water(redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater, N=5, L_total=0.12, m_flow_start=100, n_pipe=70000, Dh=0.001, CF_HeatTransfer=1, initFromEnthalpy=false, T_start=311.15, T_wall_start=311.15) 
-    annotation (Placement(transformation(origin={335.5,-189.633},
+    annotation (Placement(transformation(origin={374,-184.909},
 extent={{-10,10},{10,-10}},
 rotation=-90)));
   Modelica.Fluid.Sources.Boundary_ph boundary2(nPorts=1, redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater, p=9.999999999999999e5, h=506655) 
-    annotation(Placement(transformation(origin={335.5,-233.773},
+    annotation(Placement(transformation(origin={374,-229.049},
 extent={{10,-10},{-10,10}},
 rotation=-90)));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow1[4] 
-    annotation (Placement(transformation(origin={305.5,-189.633},
+    annotation (Placement(transformation(origin={344,-184.909},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Sources.RealExpression realExpression3(y=(water.T[1]+water.T[2]+water.T[3]+water.T[4]) / 4) 
-    annotation (Placement(transformation(origin={181.5,-189.633},
+    annotation (Placement(transformation(origin={220,-184.909},
 extent={{-10,-10},{10,10}})));
-  Modelica.Fluid.Sources.MassFlowSource_T boundary4(nPorts=1,redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,m_flow=200,T=273.15 +38) 
-    annotation (Placement(transformation(origin={335.518,-145.493},
+  Modelica.Fluid.Sources.MassFlowSource_T boundary4(nPorts=1,redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,m_flow=200,T=273.15 +20) 
+    annotation (Placement(transformation(origin={374.018,-140.769},
 extent={{-10,-10},{10,10}},
 rotation=-90)));
   Modelica.Blocks.Math.Gain gain(k=1/4) 
-    annotation (Placement(transformation(origin={269.5,-189.633},
+    annotation (Placement(transformation(origin={308,-184.909},
 extent={{-10,-10},{10,10}})));
   Modelica.Blocks.Math.Gain gain1(k=-1/4) 
-    annotation (Placement(transformation(origin={269.5,-83.3534},
+    annotation (Placement(transformation(origin={308,-78.629},
 extent={{-10,-10},{10,10}},
 rotation=90)));
-equation
+  equation
   connect(innerCore_out.portB, volume.port_a[1]) 
   annotation(Line(origin={-144.258,-1.75542},
   points={{-79.982,28.0222},{-79.982,48},{6,48},{6,64}},
@@ -360,114 +360,114 @@ equation
   points={{-41.885,31.56125},{36,31.56125},{36,-31.991},{42.4972,-31.991}},
   color={0,0,127}));
   connect(world.frame_b, revolute.frame_b) 
-  annotation(Line(origin={153,-181.833},
+  annotation(Line(origin={191.5,-177.109},
 points={{-37,65.4},{-23.6,65.4},{-23.6,24.8},{-18,24.8}}));
   connect(inertia.flange_b, revolute.axis) 
-  annotation(Line(origin={153,-181.833},
+  annotation(Line(origin={191.5,-177.109},
 points={{-18,-40},{-8,-40},{-8,14.8}}));
   connect(damper.flange_b, fixed_ground.flange) 
-  annotation(Line(origin={195,-231.833},
+  annotation(Line(origin={233.5,-227.109},
 points={{-120,10},{-128,10},{-128,-14}},
 color={0,0,0}));
   connect(damper.flange_a, inertia.flange_a) 
-  annotation(Line(origin={109,-221.833},
+  annotation(Line(origin={147.5,-217.109},
 points={{-14,0},{6,0}},
 color={0,0,0}));
   connect(world.frame_b, Engine.cylinder_a) 
-  annotation(Line(origin={149.5,-116.633},
+  annotation(Line(origin={188,-111.909},
 points={{-33.5,0.2},{46.5,0.2}},
 color={95,95,95},
 thickness=0.5));
   connect(revolute.frame_a, Engine.cylinder_a1) 
-  annotation(Line(origin={175.5,-156.633},
+  annotation(Line(origin={214,-151.909},
 points={{-20.5,-0.4},{20.5,-0.4},{20.5,-0.26}},
 color={95,95,95},
 thickness=0.5));
   connect(realExpression2.y, Engine.T_Na) 
-  annotation(Line(origin={216.5,-83.6334},
+  annotation(Line(origin={255,-78.909},
 points={{-38,0.28},{-8.2,0.28},{-8.2,-15.46}},
 color={0,0,127}));
   connect(water.portB, boundary2.ports[1]) 
-  annotation(Line(origin={407.768,-327.651},
+  annotation(Line(origin={446.268,-322.927},
 points={{-72.2499,127.996},{-72.268,103.878}},
 color={0,127,255}));
   connect(prescribedHeatFlow1.port, water.wall) 
-  annotation(Line(origin={318.5,-189.773},
+  annotation(Line(origin={357,-185.049},
 points={{-3,0.14},{13.2,0.14}},
 color={191,0,0}));
   connect(prescribedHeatFlow.port, Engine_pipe.wall) 
-  annotation(Line(origin={219.5,-37.6514},
+  annotation(Line(origin={258,-32.927},
 points={{0,-8},{0,5.109}},
 color={191,0,0}));
   connect(realExpression3.y, Engine.T_water) 
-  annotation(Line(origin={255.5,-91.6334},
+  annotation(Line(origin={294,-86.909},
 points={{-63,-98},{-47.2,-98},{-47.2,-76.82}},
 color={0,0,127}));
   connect(water.portA, boundary4.ports[1]) 
-  annotation(Line(origin={335.5,-167.773},
+  annotation(Line(origin={374,-163.049},
 points={{0.0180755,-11.8823},{0.018,12.28}},
 color={0,127,255}));
   connect(Engine.Q_out, gain.u) 
-  annotation(Line(origin={260.5,-171.633},
+  annotation(Line(origin={299,-166.909},
 points={{-14.9925,3.18},{-14.9925,-18},{-3,-18}},
 color={0,0,127}));
   connect(gain.y, prescribedHeatFlow1[1].Q_flow) 
-  annotation(Line(origin={289.5,-165.633},
+  annotation(Line(origin={328,-160.909},
 points={{-9,-24},{6,-24}},
 color={0,0,127}));
   connect(gain.y, prescribedHeatFlow1[2].Q_flow) 
-  annotation(Line(origin={288.5,-189.633},
+  annotation(Line(origin={327,-184.909},
 points={{-8,0},{7,0}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(gain.y, prescribedHeatFlow1[3].Q_flow) 
-  annotation(Line(origin={288.5,-189.633},
+  annotation(Line(origin={327,-184.909},
 points={{-8,0},{7,0}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(gain.y, prescribedHeatFlow1[4].Q_flow) 
-  annotation(Line(origin={288.5,-189.633},
+  annotation(Line(origin={327,-184.909},
 points={{-8,0},{7,0}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(Engine.Q_in, gain1.u) 
-  annotation(Line(origin={245.5,-101.633},
+  annotation(Line(origin={284,-96.909},
 points={{0.0075,-0.35},{24,-0.35},{24,6.28}},
 color={0,0,127}));
   connect(gain1.y, prescribedHeatFlow[1].Q_flow) 
-  annotation(Line(origin={244.5,-68.6334},
+  annotation(Line(origin={283,-63.909},
 points={{25,-3.72},{25,-0.72},{-25,-0.72},{-25,2.982}},
 color={0,0,127}));
   connect(gain1.y, prescribedHeatFlow[2].Q_flow) 
-  annotation(Line(origin={244.5,-68.6334},
+  annotation(Line(origin={283,-63.909},
 points={{25,-3.72},{25,-1},{-25,-1},{-25,2.982}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(gain1.y, prescribedHeatFlow[3].Q_flow) 
-  annotation(Line(origin={244.5,-68.6334},
+  annotation(Line(origin={283,-63.909},
 points={{25,-3.72},{25,-0.72},{-25,-0.72},{-25,2.982}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(gain1.y, prescribedHeatFlow[4].Q_flow) 
-  annotation(Line(origin={244.5,-68.6334},
+  annotation(Line(origin={283,-63.909},
 points={{25,-3.72},{25,-0.72},{-25,-0.72},{-25,2.982}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(expansionTank1.port, resistance_toExpTank.port_b) 
-  annotation(Line(origin={455.5,157.276},
+  annotation(Line(origin={494,162},
 points={{-201.241,-68.4},{-201.241,-84}}));
+  connect(volumeTube.port_a[1], hE1_1.tube_out) 
+  annotation(Line(origin={158.5,-2},
+points={{27.5,-22},{7,-22},{7,22},{-71.7546,22},{-71.7546,11.4356}},
+color={0,127,255}));
+  connect(pump2.port_b, hE1_1.tube_in) 
+  annotation(Line(origin={154.5,11},
+points={{23.5,37},{-5,37},{-5,-37},{-67.7546,-37},{-67.7546,-21.964417}},
+color={0,127,255}));
   connect(volumeTube.port_b[1], Engine_pipe.portA) 
-  annotation(Line(origin={184.259,-26.7244},
+  annotation(Line(origin={222.759,-22},
 points={{-24.759,-2},{25.2633,-1.99992}},
 color={0,127,255}));
   connect(pump2.port_a, Engine_pipe.portB) 
-  annotation(Line(origin={214.259,7.27558},
+  annotation(Line(origin={252.759,12},
 points={{-54.759,36},{54,36},{54,-35.9999},{15.2632,-35.9999}},
 color={0,127,255}));
   connect(resistance_toExpTank.port_a, pump2.port_a) 
-  annotation(Line(origin={207.259,56.2756},
+  annotation(Line(origin={245.759,61},
 points={{47,-3},{47,-13},{-47.759,-13}},
 color={0,127,255}));
-  connect(pump2.port_b, hE1_1.tube_in) 
-  annotation(Line(origin={113,5},
-  points={{26.5,38.2756},{3,38.2756},{3,-39},{-26.2546,-39},{-26.2546,-15.9644}},
-  color={0,127,255}));
-  connect(volumeTube.port_a[1], hE1_1.tube_out) 
-  annotation(Line(origin={117,1},
-  points={{30.5,-29.7244},{19,-29.7244},{19,29},{-30.2546,29},{-30.2546,8.43558}},
-  color={0,127,255}));
   end v4;

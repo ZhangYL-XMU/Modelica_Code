@@ -8,7 +8,7 @@ rotation=90)));
   Modelica.Blocks.Math.Gain gain(k=1/4) 
     annotation (Placement(transformation(origin={48.75,-69.86},
 extent={{-10,-10},{10,10}})));
-  Modelica.Fluid.Sources.MassFlowSource_T boundary4(nPorts=1,redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,m_flow=200,T=273.15 +38) 
+  Modelica.Fluid.Sources.MassFlowSource_T boundary4(nPorts=1,redeclare package Medium = Modelica.Media.Water.ConstantPropertyLiquidWater,m_flow=200,T=273.15 +20) 
     annotation (Placement(transformation(origin={114.768,-25.72},
 extent={{-10,-10},{10,10}},
 rotation=-90)));
@@ -36,7 +36,7 @@ rotation=90)));
   Fluid.Pipes.pipe Engine_pipe(redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, N=5, L_total=0.5, m_flow_start=100, n_pipe=3200, Dh=0.004, CF_HeatTransfer=6, initFromEnthalpy=false, T_start=803.15, T_wall_start=803.15) 
     annotation (Placement(transformation(origin={-1.25,91.031},
 extent={{-10,10},{10,-10}})));
-  SFR_Striling.Stirling.DoubleActing.DA_Engine_v3 Engine(U_h=2.0e4, U_c=4.5e5, U_reg=2.0e6, heff_Na=1.4862, heff_water=1.0) 
+  SFR_Striling.Stirling.DoubleActing.DA_Engine_v3 Engine(U_h=2.0e4, U_c=4.5e5, U_reg=2.0e6, heff_Na=1.5140, heff_water=1.0) 
     annotation (Placement(transformation(origin={6,-14},
 extent={{-30.75,-28.9},{30.75,28.9}})));
   Modelica.Mechanics.MultiBody.Joints.Revolute revolute(useAxisFlange=true, n(
@@ -50,10 +50,10 @@ extent={{-10,-10},{10,10}})));
 extent={{-10,-10},{10,10}})));
   Modelica.Mechanics.Rotational.Components.Fixed fixed_ground annotation(Placement(transformation(origin={-153.75,-126.06},
 extent={{-10,-10},{10,10}})));
-  Modelica.Mechanics.Rotational.Components.Damper damper(d=9.9936) annotation(Placement(transformation(origin={-135.75,-102.06},
+  Modelica.Mechanics.Rotational.Components.Damper damper(d=10.443) annotation(Placement(transformation(origin={-135.75,-102.06},
 extent={{10,-10},{-10,10}})));
   Thermal.HeatExchange.HE1 hE1_1(shell(momentumDynamics=Modelica.Fluid.Types.Dynamics.SteadyState)) 
-    annotation (Placement(transformation(origin={-153.75,114},
+    annotation (Placement(transformation(origin={-180,114},
 extent={{10,10},{-10,-10}},
 rotation=90)));
   TRANSFORM.Fluid.Machines.Pump_SimpleMassFlow pump2(m_flow_nominal=308.4, redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, use_input=false) 
@@ -70,10 +70,10 @@ extent={{-10,-10},{10,10}})));
     annotation(Placement(transformation(origin={-67.25,91.049},
 extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Sources.MassFlowSource_T boundary1(nPorts=1,redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium,m_flow=280.6,T=273.15 +550) 
-    annotation (Placement(transformation(origin={-192,152},
+    annotation (Placement(transformation(origin={-218.25,152},
 extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Sources.Boundary_ph boundary3(nPorts=1, redeclare package Medium = Media.Sodium.ConstantPropertyLiquidSodium, p=100000, h=506655) 
-    annotation(Placement(transformation(origin={-192,91.031},
+    annotation(Placement(transformation(origin={-218.25,91.031},
 extent={{10,-10},{-10,10}},
 rotation=-180)));
   equation
@@ -170,11 +170,11 @@ color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
 points={{-201.241,-68.4},{-201.241,-84}}));
   connect(volumeTube.port_a[1], hE1_1.tube_out) 
   annotation(Line(origin={-100.75,113.049},
-points={{27.5,-22},{7,-22},{7,22},{-47.00181,22},{-47.00181,11.151}},
+points={{27.5,-22},{7,-22},{7,22},{-73.25181,22},{-73.25181,11.151}},
 color={0,127,255}));
   connect(pump2.port_b, hE1_1.tube_in) 
   annotation(Line(origin={-104.75,126.049},
-points={{23.5,37},{-5,37},{-5,-37},{-43.00181,-37},{-43.00181,-22.249}},
+points={{23.5,37},{-5,37},{-5,-37},{-69.25181,-37},{-69.25181,-22.249}},
 color={0,127,255}));
   connect(volumeTube.port_b[1], Engine_pipe.portA) 
   annotation(Line(origin={-36.491,93.049},
@@ -189,11 +189,11 @@ color={0,127,255}));
 points={{47,-3},{47,-13},{-47.759,-13}},
 color={0,127,255}));
   connect(boundary1.ports[1], hE1_1.shell_in) 
-  annotation(Line(origin={-171,138},
-  points={{-11,14},{11.0482,14},{11.0482,-13.8}},
-  color={0,127,255}));
+  annotation(Line(origin={-197.25,138},
+points={{-11,14},{11.0482,14},{11.0482,-13.8}},
+color={0,127,255}));
   connect(hE1_1.shell_out, boundary3.ports[1]) 
-  annotation(Line(origin={-171,97},
-  points={{11.0482,6.8},{11.0482,-5.969},{-11,-5.969}},
-  color={0,127,255}));
+  annotation(Line(origin={-197.25,97},
+points={{11.0482,6.8},{11.0482,-5.969},{-11,-5.969}},
+color={0,127,255}));
   end v1;
