@@ -1,6 +1,6 @@
 model v1
-  annotation(__MWORKS(version="26.6.0",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=0.02,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=120,StoreEventValue=0,Tolerance=0.0001));
+  annotation(__MWORKS(version="26.6.0",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=0.6,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
+grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=3600,StoreEventValue=0,Tolerance=0.0001));
   Modelica.Blocks.Math.Gain gain1(k=-1/4) 
     annotation (Placement(transformation(origin={48.75,36.42},
 extent={{-10,-10},{10,10}},

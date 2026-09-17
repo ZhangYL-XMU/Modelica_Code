@@ -2,11 +2,11 @@ model v1_ROM
   annotation(__MWORKS(version="26.6.0"),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})));
   Modelica.Blocks.Math.Gain gain1(k=-1/4) 
-    annotation (Placement(transformation(origin={48.75,36.42},
+    annotation (Placement(transformation(origin={28,36.42},
 extent={{-10,-10},{10,10}},
 rotation=90)));
   Modelica.Blocks.Sources.RealExpression realExpression1(y=(Engine_pipe.T[1]+Engine_pipe.T[2]+Engine_pipe.T[3]+Engine_pipe.T[4]) / 4) 
-    annotation (Placement(transformation(origin={-98,0.367778},
+    annotation (Placement(transformation(origin={-96,11.7758},
 extent={{-10,-10},{10,10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow prescribedHeatFlow[4] 
     annotation (Placement(transformation(origin={-1.25,64.122},
@@ -39,9 +39,9 @@ extent={{-10,-10},{10,10}})));
     annotation(Placement(transformation(origin={-192,91.031},
 extent={{10,-10},{-10,10}},
 rotation=-180)));
-  v3Test.ROM.ROM_Basis rOM_Basis 
-    annotation (Placement(transformation(origin={-18.625,-2},
-extent={{-34,-32},{34,32}})));
+  v4.ROM.ROM_Basis rOM_Basis 
+    annotation (Placement(transformation(origin={-24.625,10},
+extent={{-27,-24},{27,24}})));
   equation
   connect(prescribedHeatFlow.port, Engine_pipe.wall) 
   annotation(Line(origin={-1.25,82.122},
@@ -49,19 +49,19 @@ points={{0,-8},{0,5.109}},
 color={191,0,0}));
   connect(gain1.y, prescribedHeatFlow[1].Q_flow) 
   annotation(Line(origin={23.75,51.14},
-points={{25,-3.72},{25,-0.72},{-25,-0.72},{-25,2.982}},
+points={{4.25,-3.72},{4.25,-0.72},{-25,-0.72},{-25,2.982}},
 color={0,0,127}));
   connect(gain1.y, prescribedHeatFlow[2].Q_flow) 
   annotation(Line(origin={23.75,51.14},
-points={{25,-3.72},{25,-1},{-25,-1},{-25,2.982}},
+points={{4.25,-3.72},{4.25,-0.72},{-25,-0.72},{-25,2.982}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(gain1.y, prescribedHeatFlow[3].Q_flow) 
   annotation(Line(origin={23.75,51.14},
-points={{25,-3.72},{25,-0.72},{-25,-0.72},{-25,2.982}},
+points={{4.25,-3.72},{4.25,-0.72},{-25,-0.72},{-25,2.982}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(gain1.y, prescribedHeatFlow[4].Q_flow) 
   annotation(Line(origin={23.75,51.14},
-points={{25,-3.72},{25,-0.72},{-25,-0.72},{-25,2.982}},
+points={{4.25,-3.72},{4.25,-0.72},{-25,-0.72},{-25,2.982}},
 color={0,0,127}),__MWORKS(BlockSystem(NamedSignal)));
   connect(expansionTank1.port, resistance_toExpTank.port_b) 
   annotation(Line(origin={234.75,277.049},
@@ -95,11 +95,11 @@ color={0,127,255}));
   points={{11.0482,6.8},{11.0482,-5.969},{-11,-5.969}},
   color={0,127,255}));
   connect(rOM_Basis.ROM_OUT[2], gain1.u) 
-  annotation(Line(origin={32,12},
-  points={{-16.625,-11.6322},{16.75,-11.6322},{16.75,12.42}},
+  annotation(Line(origin={15,18},
+  points={{-12.625,-6.22417},{13,-6.22417},{13,6.42}},
   color={0,0,127}));
-  connect(rOM_Basis.ROM_IN[1], realExpression1.y) 
-  annotation(Line(origin={-69,0},
-  points={{17.055,0.367778},{-18,0.367778}},
-  color={0,0,127}));
+  connect(realExpression1.y, rOM_Basis.ROM_IN[1]) 
+  annotation(Line(origin={-69,24},
+points={{-16,-12.2242},{17.915,-12.2242}},
+color={0,0,127}));
   end v1_ROM;
