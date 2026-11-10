@@ -1,4 +1,4 @@
-model v3
+model v3_Beta
 "积分热导率"
   annotation(__MWORKS(version="26.6.0",ContinueSimConfig(SaveContinueFile="false",SaveBeforeStop="false",NumberBeforeStop=1,FixedContinueInterval="false",ContinueIntervalLength=100,ContinueTimeVector)),Diagram(coordinateSystem(extent={{-100,-100},{100,100}},
 grid={2,2})),experiment(Algorithm=Dassl,InlineIntegrator=false,InlineStepSize=false,Interval=0.01,StartTime=0,StopTime=3600,StoreEventValue=0,Tolerance=0.0001));
@@ -230,4 +230,4 @@ color={0,0,127}));
   annotation(Line(origin={-100,11},
 points={{15.1944,2.009},{-8.5028,2.009}},
 color={127,0,0}));
-  end v3;
+  end v3_Beta;
