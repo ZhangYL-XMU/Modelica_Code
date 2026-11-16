@@ -514,7 +514,7 @@ required from medium model \"" + mediumName + "\".
 <li>热导率（过冷/饱和）：&lambda; = 1.72958(54.306 - 1.878e-2(1.8t+32) + 2.0914e-6(1.8t+32)<sup>2</sup>) [W/(m.K)]</li>
 <li>定压比热：cp = 4186.8(0.389352 - 1.10599e-4(1.8t) + 3.41178e-8(1.8t)<sup>2</sup>) [J/(kg.K)]</li>
 <li>动力粘度：&mu; = 0.1235&rho;<sup>1/3</sup>e<sup>697&rho;/T</sup> (T&lt;773K)；&mu; = 0.0851&rho;<sup>1/3</sup>e<sup>1040&rho;/T</sup> (T&ge;773K) [cP，&rho; 为 g/cm<sup>3</sup>，T 为 K]</li>
-<li>体膨胀系数：&beta; = 2.418e-4 + 7.385e-8 + 15.64e-12 t<sup>2</sup> [1/K]（按题给形式）</li>
+<li>体膨胀系数：&beta; = 2.418e-4 + 7.385e-8 t + 15.64e-12 t<sup>2</sup> [1/K]（按题给形式，t 为摄氏温度）</li>
 </ol>
 <p><b>说明</b>：</p>
 <ul>
