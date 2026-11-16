@@ -3,3 +3,4 @@ test_pipe_new_sodium
 compare
 test_pipe_pT
 test_HeatTransfer_cmp
+test_pipe_sodium_variable

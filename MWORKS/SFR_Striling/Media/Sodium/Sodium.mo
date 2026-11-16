@@ -31,19 +31,25 @@ package Sodium "液态钠介质（物性随温度变化，忽略压力影响；�
       molarMass=0.0229897693)};
 
   //-------------------------------------------------------------------------
-  // 热力学状态记录（p, T 独立）
+  // 热力学状态记录——单字段轻量记录 {h}
+  // 说明：本介质为不可压缩（singleState=true）、物性仅随温度变化，压力与
+  //       物性无关，因此 ThermodynamicState 只携带比焓 h；压力 p 由端口/
+  //       控制体变量单独传递。setState_phX 仅做纯记录构造（不反演温度），
+  //       温度只在属性函数需要时由 temperature_phX 计算。
+  //       TY 对“多字段 record 作为函数返回值参与方程”的展开/求导存在缺陷
+  //       （实测 pipe.mo 的 states[i]=setState_phX 会卡在 states[i].p 的
+  //       非线性迭代），单字段记录可让该方程退化为标量别名，稳定求解。
   //-------------------------------------------------------------------------
   redeclare record extends ThermodynamicState "Thermodynamic state"
-    AbsolutePressure p "Absolute pressure of medium";
-    Temperature T "Temperature of medium";
+    SpecificEnthalpy h(stateSelect=StateSelect.never) "Specific enthalpy of medium";
   end ThermodynamicState;
 
   //-------------------------------------------------------------------------
   // BaseProperties
   //-------------------------------------------------------------------------
   redeclare replaceable model extends BaseProperties(
-    T(stateSelect=if preferredMediumStates then StateSelect.prefer else StateSelect.default),
-    p(stateSelect=if preferredMediumStates then StateSelect.prefer else StateSelect.default))
+    p(stateSelect=if preferredMediumStates then StateSelect.prefer else StateSelect.default),
+    T(stateSelect=StateSelect.never))
     "Base properties of liquid sodium"
   equation
     assert(T >= T_min and T <= T_max, "
@@ -56,8 +62,7 @@ required from medium model \"" + mediumName + "\".
     u = specificInternalEnergy(state);
     R_s = 0;
     MM = MM_const;
-    state.T = T;
-    state.p = p;
+    state.h = h;
   end BaseProperties;
 
   //-------------------------------------------------------------------------
@@ -71,7 +76,7 @@ required from medium model \"" + mediumName + "\".
     input MassFraction X[:]=reference_X "Mass fractions";
     output ThermodynamicState state "Thermodynamic state record";
   algorithm
-    state := ThermodynamicState(p=p, T=T);
+    state := ThermodynamicState(h=Functions.h_T(T));
     annotation(Inline=true);
   end setState_pTX;
 
@@ -83,7 +88,7 @@ required from medium model \"" + mediumName + "\".
     input MassFraction X[:]=reference_X "Mass fractions";
     output ThermodynamicState state "Thermodynamic state record";
   algorithm
-    state := ThermodynamicState(p=p, T=temperature_phX(p, h, X));
+    state := ThermodynamicState(h=h);
     annotation(Inline=true);
   end setState_phX;
 
@@ -95,7 +100,7 @@ required from medium model \"" + mediumName + "\".
     input MassFraction X[:]=reference_X "Mass fractions";
     output ThermodynamicState state "Thermodynamic state record";
   algorithm
-    state := ThermodynamicState(p=p, T=T_ps(s));
+    state := ThermodynamicState(h=Functions.h_T(T_ps(s)));
     annotation(Inline=true);
   end setState_psX;
 
@@ -114,74 +119,138 @@ required from medium model \"" + mediumName + "\".
   redeclare function extends setSmoothState
     "Return thermodynamic state so that it smoothly approximates: if x > 0 then state_a else state_b"
   algorithm
-    state := ThermodynamicState(p=Modelica.Media.Common.smoothStep(
+    state := ThermodynamicState(h=Modelica.Media.Common.smoothStep(
         x,
-        state_a.p,
-        state_b.p,
-        x_small), T=Modelica.Media.Common.smoothStep(
-        x,
-        state_a.T,
-        state_b.T,
+        state_a.h,
+        state_b.h,
         x_small));
   end setSmoothState;
 
   //-------------------------------------------------------------------------
-  // 属性函数
+  // 属性函数（全部以轻量状态记录 {h} 为输入；温度按需由 h 反演）
   //-------------------------------------------------------------------------
-  redeclare function extends dynamicViscosity "Return dynamic viscosity"
+  function T_state "内部辅助：由轻量状态记录 {h} 计算温度"
+    extends Modelica.Icons.Function;
+    input ThermodynamicState state "Thermodynamic state record";
+    output Temperature T "Temperature";
   algorithm
-    eta := Functions.eta_dT(Functions.d_T(state.T), state.T);
+    T := temperature_phX(reference_p, state.h, reference_X);
+    annotation(Inline=true, derivative=T_state_der);
+  end T_state;
+
+  function T_state_der "T_state 对时间导数（不可压缩：dT/dt = (dh/dt)/cp）"
+    extends Modelica.Icons.Function;
+    input ThermodynamicState state "Thermodynamic state record";
+    input ThermodynamicState state_der "Derivative of thermodynamic state record";
+    output Real T_der "dT/dt";
+  algorithm
+    T_der := state_der.h/max(Functions.cp_T(temperature_phX(reference_p, state.h, reference_X)), 1.0);
+    annotation(Inline=true);
+  end T_state_der;
+
+  redeclare function extends dynamicViscosity "Return dynamic viscosity"
+  protected
+    Temperature T;
+  algorithm
+    T := T_state(state);
+    eta := Functions.eta_dT(Functions.d_T(T), T);
     annotation(Inline=true);
   end dynamicViscosity;
 
   redeclare function extends thermalConductivity "Return thermal conductivity"
   algorithm
-    lambda := Functions.lambda_T(state.T);
+    lambda := Functions.lambda_T(T_state(state));
     annotation(Inline=true);
   end thermalConductivity;
 
-  redeclare function extends pressure "Return pressure"
+  redeclare function extends pressure "Return pressure（不可压缩介质不存储压力，返回参考压力）"
   algorithm
-    p := state.p;
+    p := reference_p;
     annotation(Inline=true);
   end pressure;
 
   redeclare function extends temperature "Return temperature"
   algorithm
-    T := state.T;
+    T := T_state(state);
     annotation(Inline=true);
   end temperature;
 
   redeclare function extends density "Return density"
   algorithm
-    d := Functions.d_T(state.T);
-    annotation(Inline=true);
+    d := Functions.d_T(T_state(state));
+    annotation(Inline=true, derivative=density_der);
   end density;
+
+  function density_der "density 对时间导数（不可压缩：dρ/dt = dρ/dT · dh/dt / cp）"
+    extends Modelica.Icons.Function;
+    input ThermodynamicState state "Thermodynamic state record";
+    input ThermodynamicState state_der "Derivative of thermodynamic state record";
+    output Real d_der "dρ/dt";
+  protected
+    Temperature T;
+    Real tC;
+    Real uu;
+    Real ddTp;
+  algorithm
+    T := T_state(state);
+    tC := Modelica.Units.Conversions.to_degC(T);
+    uu := 1.8*tC + 32;
+    ddTp := 16.0185*1.8*(-7.9504e-3 - 2*0.2872e-6*uu + 3*0.603e-9*uu^2);
+    d_der := ddTp*state_der.h/max(Functions.cp_T(T), 1.0);
+    annotation(Inline=true);
+  end density_der;
 
   redeclare function extends specificEnthalpy "Return specific enthalpy"
   algorithm
-    h := Functions.h_T(state.T);
+    h := state.h;
     annotation(Inline=true);
   end specificEnthalpy;
 
   redeclare function extends specificInternalEnergy
     "Return specific internal energy (incompressible limit: u = h - p_ref/d)"
+  protected
+    Temperature T;
   algorithm
-    u := Functions.h_T(state.T) - reference_p/Functions.d_T(state.T);
-    annotation(Inline=true);
+    T := T_state(state);
+    u := state.h - reference_p/Functions.d_T(T);
+    annotation(Inline=true, derivative=specificInternalEnergy_der);
   end specificInternalEnergy;
+
+  function specificInternalEnergy_der
+    "specificInternalEnergy 对时间导数（u = h - p_ref/ρ）"
+    extends Modelica.Icons.Function;
+    input ThermodynamicState state "Thermodynamic state record";
+    input ThermodynamicState state_der "Derivative of thermodynamic state record";
+    output Real u_der "du/dt";
+  protected
+    Temperature T;
+    Density d;
+    SpecificHeatCapacity cp;
+    Real tC;
+    Real uu;
+    Real ddTp;
+  algorithm
+    T := T_state(state);
+    d := Functions.d_T(T);
+    cp := Functions.cp_T(T);
+    tC := Modelica.Units.Conversions.to_degC(T);
+    uu := 1.8*tC + 32;
+    ddTp := 16.0185*1.8*(-7.9504e-3 - 2*0.2872e-6*uu + 3*0.603e-9*uu^2);
+    u_der := state_der.h*(1.0 + reference_p*ddTp/(d*d*max(cp, 1.0)));
+    annotation(Inline=true);
+  end specificInternalEnergy_der;
 
   redeclare function extends specificHeatCapacityCp
     "Return specific heat capacity at constant pressure"
   algorithm
-    cp := Functions.cp_T(state.T);
+    cp := Functions.cp_T(T_state(state));
     annotation(Inline=true);
   end specificHeatCapacityCp;
 
   redeclare function extends specificHeatCapacityCv
     "Return specific heat capacity at constant volume (incompressible limit: cv = cp)"
   algorithm
-    cv := Functions.cp_T(state.T);
+    cv := Functions.cp_T(T_state(state));
     annotation(Inline=true);
   end specificHeatCapacityCv;
 
@@ -197,32 +266,35 @@ required from medium model \"" + mediumName + "\".
 
   redeclare function extends specificEntropy
     "Return specific entropy (exact integral of cp(T)/T, s(T0)=0)"
+  protected
+    Temperature T;
   algorithm
-    s := s_T(state.T);
+    T := T_state(state);
+    s := s_T(T);
     annotation(Inline=true);
   end specificEntropy;
 
   redeclare function extends specificGibbsEnergy
     "Return specific Gibbs energy"
   algorithm
-    g := specificEnthalpy(state) - state.T*specificEntropy(state);
+    g := state.h - T_state(state)*specificEntropy(state);
   end specificGibbsEnergy;
 
   redeclare function extends specificHelmholtzEnergy
     "Return specific Helmholtz energy"
   algorithm
-    f := specificInternalEnergy(state) - state.T*specificEntropy(state);
+    f := specificInternalEnergy(state) - T_state(state)*specificEntropy(state);
   end specificHelmholtzEnergy;
 
   redeclare function extends isentropicEnthalpy "Return isentropic enthalpy"
   algorithm
-    h_is := specificEnthalpy(refState);
+    h_is := refState.h;
   end isentropicEnthalpy;
 
   redeclare function extends isobaricExpansionCoefficient
     "Returns overall the isobaric expansion coefficient beta"
   algorithm
-    beta := Functions.beta_T(state.T);
+    beta := Functions.beta_T(T_state(state));
     annotation(Inline=true);
   end isobaricExpansionCoefficient;
 
@@ -244,7 +316,7 @@ required from medium model \"" + mediumName + "\".
     Real tC;
     Real u;
   algorithm
-    tC := Modelica.Units.Conversions.to_degC(state.T);
+    tC := Modelica.Units.Conversions.to_degC(T_state(state));
     u := 1.8*tC + 32;
     ddTp := 16.0185*1.8*(-7.9504e-3 - 2*0.2872e-6*u + 3*0.603e-9*u^2);
     annotation(Inline=true);
@@ -259,7 +331,7 @@ required from medium model \"" + mediumName + "\".
   redeclare function extends density_derh_p
     "Return density derivative w.r.t. specific enthalpy at constant pressure"
   algorithm
-    ddhp := density_derT_p(state)/max(Functions.cp_T(state.T), 1.0);
+    ddhp := density_derT_p(state)/max(Functions.cp_T(T_state(state)), 1.0);
     annotation(Inline=true);
   end density_derh_p;
 
@@ -275,12 +347,18 @@ required from medium model \"" + mediumName + "\".
   end molarMass;
 
   function specificInternalEnergy_derT_p
-    "Return specific internalEnergy derivative w.r.t. temperature at const pressure"
+    "Return specific internalEnergy derivative w.r.t. temperature at const pressure (u = h - p_ref/rho)"
     extends Modelica.Icons.Function;
     input ThermodynamicState state "Thermodynamic state record";
     output Real duTp "specific internalEnergy derivative w.r.t. temperature";
+  protected
+    Temperature T;
+    Density d;
   algorithm
-    duTp := Functions.cp_T(state.T);
+    T := T_state(state);
+    d := Functions.d_T(T);
+    // du/dT|p = cp - p_ref*d(1/rho)/dT = cp + p_ref/rho^2 * drho/dT
+    duTp := Functions.cp_T(T) + reference_p*density_derT_p(state)/(d*d);
     annotation(__MWORKS(version="2025a"));
   end specificInternalEnergy_derT_p;
 
@@ -299,7 +377,7 @@ required from medium model \"" + mediumName + "\".
     extends Modelica.Icons.Function;
     input AbsolutePressure p "Pressure";
     input Temperature T "Temperature";
-    input MassFraction X[nX] "Mass fractions";
+    input MassFraction X[nX]=reference_X "Mass fractions";
     output SpecificEnthalpy h "Specific enthalpy";
   algorithm
     h := Functions.h_T(T);
@@ -311,7 +389,7 @@ required from medium model \"" + mediumName + "\".
     extends Modelica.Icons.Function;
     input AbsolutePressure p "Pressure";
     input SpecificEnthalpy h "Specific enthalpy";
-    input MassFraction X[nX] "Mass fractions";
+    input MassFraction X[nX]=reference_X "Mass fractions";
     output Temperature T "Temperature";
   protected
     constant Real a=0.389352;
@@ -377,7 +455,7 @@ required from medium model \"" + mediumName + "\".
     extends Modelica.Icons.Function;
     input AbsolutePressure p "Pressure";
     input SpecificEnthalpy h "Specific enthalpy";
-    input MassFraction X[nX] "Mass fractions";
+    input MassFraction X[nX]=reference_X "Mass fractions";
     output Density d "Density";
   algorithm
     d := Functions.d_T(temperature_phX(p, h, X));
@@ -444,6 +522,10 @@ required from medium model \"" + mediumName + "\".
 <li>粘度关联式的 &rho; 为 <b>g/cm<sup>3</sup></b>、结果为 <b>cP</b>，函数内换算为 kg/m<sup>3</sup> 与 Pa.s。</li>
 <li>介质取 <code>singleState=true</code>（u、d 与压力无关），按 MSL Incompressible.TableBased 约定
 u = h - p_ref/d；等温压缩率取 0；声速取近似常值 2400 m/s（题给关联式未给出）。</li>
+<li><b>ThermodynamicState 为单字段轻量记录 {h}</b>：介质不可压缩、物性仅随温度变化，压力不进入状态；
+<code>setState_phX</code> 仅构造记录（不反演温度），温度只在 <code>temperature()/density()/dynamicViscosity()</code>
+等属性函数需要时由 <code>temperature_phX(reference_p,h)</code> 计算。这样 pipe.mo 的 <code>states[N]</code>
+数组在方程/初始化阶段退化为比焓别名，既避免温度反演被状态化，也规避了 TY 对多字段 record 函数方程展开的缺陷。</li>
 <li>熵由 cp(T)/T 解析积分（s(T0)=0），T 由 h、s 的 Newton 迭代反演（单调解，收敛可靠）。</li>
 <li>适用范围：T_min=371.15 K（98℃，高于熔点）至 T_max=1400 K；应用范围需欠热液态。</li>
 </ul>
