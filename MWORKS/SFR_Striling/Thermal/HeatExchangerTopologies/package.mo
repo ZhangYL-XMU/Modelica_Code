@@ -1,4 +1,0 @@
-within SFR_Striling.Thermal;
-package HeatExchangerTopologies
-
-end HeatExchangerTopologies;

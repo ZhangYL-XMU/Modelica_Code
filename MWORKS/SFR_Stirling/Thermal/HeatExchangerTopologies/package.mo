@@ -1,0 +1,4 @@
+within SFR_Stirling.Thermal;
+package HeatExchangerTopologies
+
+end HeatExchangerTopologies;
