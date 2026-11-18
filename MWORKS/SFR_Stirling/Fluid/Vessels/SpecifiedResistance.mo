@@ -17,13 +17,19 @@ equation
   port_b.C_outflow = inStream(port_a.C_outflow);
   annotation (
     defaultComponentName="resistance",
-    Icon(coordinateSystem(extent={{-100,-100},{100,100}},
-grid={2,2}),graphics = {Bitmap(origin={0,0},
-extent={{-120,-67},{120,67}},
-fileName="modelica://SFR_Striling/Resources/Images/Icons/Resistance_Fluid.jpg"), Text(origin={1,-88},
-lineColor={0,0,255},
-extent={{-150,20},{150,-20}},
-textString="%name",
-textColor={0,0,255})}),
+    Icon(
+      coordinateSystem(extent={{-100,-100},{100,100}}, grid={2,2}),
+      graphics={
+        Line(
+          points={{-80,0},{-60,0},{-50,30},{-36,-30},{-22,30},{-8,-30},{6,30},{20,-30},{34,30},{48,-30},{60,0},{80,0}},
+          color={0,0,255},
+          thickness=2,
+          smooth=Smooth.None),
+        Text(
+          origin={0,-80},
+          extent={{-150,20},{150,-20}},
+          lineColor={0,0,255},
+          textColor={0,0,255},
+          textString="%name")}),
     Diagram(coordinateSystem(preserveAspectRatio=false)));
 end SpecifiedResistance;
